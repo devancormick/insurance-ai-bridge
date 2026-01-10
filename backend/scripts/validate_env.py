@@ -70,10 +70,10 @@ def main():
     all_required_ok = True
     
     for var_name, is_set, description in required_results:
-        status = "✓" if is_set else "✗"
-        required_mark = "[REQUIRED]" if required_results.index((var_name, is_set, description)) < len([r for r in required_results if r[1] is False]) else ""
+        status = "[OK]" if is_set else "[MISSING]"
+        required_mark = "[REQUIRED]" if not is_set else ""
         print(f"{status} {var_name:25s} {description} {required_mark}")
-        if not is_set and required_results.index((var_name, is_set, description)) < len(required_results):
+        if not is_set:
             all_required_ok = False
     
     print()
@@ -84,7 +84,7 @@ def main():
     optional_results = check_optional_config()
     
     for var_name, is_set, description in optional_results:
-        status = "✓" if is_set else "○"
+        status = "[SET]" if is_set else "[NOT SET]"
         print(f"{status} {var_name:25s} {description}")
     
     print()
@@ -101,11 +101,11 @@ def main():
     print()
     
     if all_required_ok:
-        print("✓ All required variables are configured!")
+        print("[SUCCESS] All required variables are configured!")
         print("  System is ready for deployment.")
         return 0
     else:
-        print("✗ Some required variables are missing!")
+        print("[ERROR] Some required variables are missing!")
         print("  Please configure all required variables before deployment.")
         print()
         print("  Copy .env.example to .env and fill in the values:")

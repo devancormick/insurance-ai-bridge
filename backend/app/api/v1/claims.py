@@ -1,14 +1,51 @@
 """Claims API endpoints."""
-from fastapi import APIRouter, HTTPException
-from typing import Dict, Any
+from fastapi import APIRouter, HTTPException, Query
+from typing import Dict, Any, List, Optional
 from app.schemas.claim_analysis import ClaimAnalysisRequest, ClaimAnalysisResponse
 from app.core.pii_handler import PIIHandler
 from app.core.data_aggregator import DataAggregator
 from app.core.llm_orchestrator import LLMOrchestrator
+from app.core.cache import cache
 from app.utils.logging import logger
 import time
 
 router = APIRouter()
+
+
+@router.get("", response_model=List[dict], summary="List claims")
+async def list_claims(
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=100),
+    status: Optional[str] = Query(None, description="Filter by claim status"),
+    member_id: Optional[str] = Query(None, description="Filter by member ID")
+) -> List[dict]:
+    """
+    List claims with optional filtering.
+    
+    Args:
+        skip: Number of records to skip
+        limit: Maximum number of records to return
+        status: Filter by claim status
+        member_id: Filter by member ID
+        
+    Returns:
+        List of claim dictionaries
+    """
+    # TODO: Implement actual database query
+    # For now, return empty list
+    # In production, query from database with filters
+    cache_key = f"claims:list:skip:{skip}:limit:{limit}:status:{status}:member:{member_id}"
+    cached = await cache.get(cache_key)
+    if cached:
+        return cached
+    
+    # Placeholder for actual implementation
+    claims = []
+    
+    # Cache for 2 minutes
+    await cache.set(cache_key, claims, ttl=120)
+    
+    return claims
 
 
 @router.post(
