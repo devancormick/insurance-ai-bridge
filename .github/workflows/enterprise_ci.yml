@@ -10,6 +10,10 @@ env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
 
+permissions:
+  contents: read
+  security-events: write
+
 jobs:
   quality-gates:
     name: Quality Gates
@@ -33,9 +37,10 @@ jobs:
           output: 'trivy-results.sarif'
       
       - name: Upload Security Results
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: 'trivy-results.sarif'
+        continue-on-error: true
 
   build-and-test:
     name: Build and Test
