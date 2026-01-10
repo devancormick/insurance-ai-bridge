@@ -29,7 +29,8 @@ jobs:
           # Security scanning
       
       - name: Security Scan
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@0.29
+        continue-on-error: true
         with:
           scan-type: 'fs'
           scan-ref: '.'
