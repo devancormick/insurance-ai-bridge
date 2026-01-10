@@ -2,10 +2,19 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
+from sqlalchemy.exc import SQLAlchemyError
 from app.config import settings
 from app.api.v1.router import api_router
 from app.core.rate_limiter import rate_limit_middleware, get_rate_limit_config
 from app.core.cache import cache
+from app.core.error_handlers import (
+    validation_exception_handler,
+    sqlalchemy_exception_handler,
+    custom_exception_handler,
+    general_exception_handler
+)
+from app.core.exceptions import InsuranceAIBridgeException
 from app.utils.logging import logger
 import time
 
@@ -52,18 +61,11 @@ async def log_requests(request: Request, call_next):
     response.headers["X-Process-Time"] = str(process_time)
     return response
 
-# Global exception handler
-@app.exception_handler(Exception)
-async def global_exception_handler(request: Request, exc: Exception):
-    """Handle unhandled exceptions."""
-    logger.error(f"Unhandled exception: {exc}", exc_info=True)
-    return JSONResponse(
-        status_code=500,
-        content={
-            "detail": "Internal server error",
-            "path": str(request.url.path)
-        }
-    )
+# Register exception handlers
+app.add_exception_handler(RequestValidationError, validation_exception_handler)
+app.add_exception_handler(SQLAlchemyError, sqlalchemy_exception_handler)
+app.add_exception_handler(InsuranceAIBridgeException, custom_exception_handler)
+app.add_exception_handler(Exception, general_exception_handler)
 
 # Include API routes
 app.include_router(api_router, prefix="/api/v1")
