@@ -239,7 +239,7 @@ resource "aws_lb" "main" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.api[count.index].id]
-  subnets            = aws_subnet.public[*].id
+  subnets            = slice(aws_subnet.public[*].id, count.index * 3, (count.index + 1) * 3)
   
   enable_deletion_protection = var.environment == "prod" ? true : false
   
@@ -273,7 +273,7 @@ resource "aws_launch_template" "backend" {
 resource "aws_autoscaling_group" "backend" {
   count              = length(var.regions)
   name               = "backend-asg-${var.regions[count.index]}"
-  vpc_zone_identifier = aws_subnet.private[*].id
+  vpc_zone_identifier = slice(aws_subnet.private[*].id, count.index * 3, (count.index + 1) * 3)
   target_group_arns  = [aws_lb_target_group.backend[count.index].arn]
   health_check_type  = "ELB"
   
@@ -350,7 +350,7 @@ data "aws_ami" "amazon_linux" {
 resource "aws_db_subnet_group" "main" {
   count      = length(var.regions)
   name       = "postgres-subnet-group-${var.regions[count.index]}"
-  subnet_ids = aws_subnet.private[*].id
+  subnet_ids = slice(aws_subnet.private[*].id, count.index * 3, (count.index + 1) * 3)
   
   tags = {
     Name = "postgres-subnet-group-${var.regions[count.index]}"
@@ -418,7 +418,7 @@ variable "db_password" {
 resource "aws_elasticache_subnet_group" "redis" {
   count      = length(var.regions)
   name       = "redis-subnet-group-${var.regions[count.index]}"
-  subnet_ids = aws_subnet.private[*].id
+  subnet_ids = slice(aws_subnet.private[*].id, count.index * 3, (count.index + 1) * 3)
 }
 
 resource "aws_elasticache_replication_group" "redis" {
