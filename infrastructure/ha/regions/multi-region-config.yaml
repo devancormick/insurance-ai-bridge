@@ -1,0 +1,106 @@
+# Multi-Region Active-Active Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: multi-region-config
+  namespace: insurance-ai-bridge
+data:
+  regions.yaml: |
+    regions:
+      - name: us-east-1
+        enabled: true
+        primary: true
+        endpoints:
+          api: https://api-us-east-1.insurance-ai-bridge.com
+          database: postgres-us-east-1.cluster-xxxxx.us-east-1.rds.amazonaws.com
+          redis: redis-us-east-1.cache.amazonaws.com:6379
+        health_check:
+          url: https://api-us-east-1.insurance-ai-bridge.com/health
+          interval: 10s
+          timeout: 5s
+          failure_threshold: 3
+        failover_priority: 1
+      
+      - name: us-west-2
+        enabled: true
+        primary: false
+        endpoints:
+          api: https://api-us-west-2.insurance-ai-bridge.com
+          database: postgres-us-west-2.cluster-xxxxx.us-west-2.rds.amazonaws.com
+          redis: redis-us-west-2.cache.amazonaws.com:6379
+        health_check:
+          url: https://api-us-west-2.insurance-ai-bridge.com/health
+          interval: 10s
+          timeout: 5s
+          failure_threshold: 3
+        failover_priority: 2
+      
+      - name: eu-west-1
+        enabled: true
+        primary: false
+        endpoints:
+          api: https://api-eu-west-1.insurance-ai-bridge.com
+          database: postgres-eu-west-1.cluster-xxxxx.eu-west-1.rds.amazonaws.com
+          redis: redis-eu-west-1.cache.amazonaws.com:6379
+        health_check:
+          url: https://api-eu-west-1.insurance-ai-bridge.com/health
+          interval: 10s
+          timeout: 5s
+          failure_threshold: 3
+        failover_priority: 3
+    
+    failover:
+      automatic: true
+      rto_seconds: 30
+      health_check_window: 30s
+      min_healthy_regions: 1
+    
+    replication:
+      mode: active_active
+      consistency: eventual
+      conflict_resolution: last_write_wins
+      replication_lag_threshold_ms: 1000
+
+---
+# Global Load Balancer Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: global-lb-config
+  namespace: insurance-ai-bridge
+data:
+  load-balancer.yaml: |
+    routing:
+      method: geo_performance  # geo, performance, weighted, failover
+      geo_routing:
+        enabled: true
+        rules:
+          - region: us-east
+            target: us-east-1
+            weight: 100
+          - region: us-west
+            target: us-west-2
+            weight: 100
+          - region: eu
+            target: eu-west-1
+            weight: 100
+      
+      health_checks:
+        enabled: true
+        interval: 10s
+        timeout: 5s
+        healthy_threshold: 2
+        unhealthy_threshold: 3
+        path: /health
+      
+      failover:
+        enabled: true
+        primary_region: us-east-1
+        failover_regions:
+          - us-west-2
+          - eu-west-1
+        failover_trigger:
+          error_rate_threshold: 0.1
+          latency_threshold_ms: 1000
+          consecutive_failures: 3
+
