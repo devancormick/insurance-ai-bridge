@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security & Compliance - AI Bridge System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            color: #e2e8f0;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .header h1 {
+            font-size: 42px;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #22c55e 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            color: #94a3b8;
+            font-size: 16px;
+        }
+
+        /* Compliance Badges */
+        .compliance-badges {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 50px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background: #1e293b;
+            border: 2px solid #22c55e;
+            border-radius: 12px;
+            padding: 20px 30px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .badge:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(34, 197, 94, 0.3);
+        }
+
+        .badge-icon {
+            font-size: 32px;
+        }
+
+        .badge-info h3 {
+            font-size: 16px;
+            color: #22c55e;
+            margin-bottom: 4px;
+        }
+
+        .badge-info p {
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        /* Security Layers */
+        .security-layers {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 16px;
+            padding: 40px;
+            margin-bottom: 40px;
+        }
+
+        .security-layers h2 {
+            font-size: 28px;
+            margin-bottom: 30px;
+            text-align: center;
+            color: #f1f5f9;
+        }
+
+        .layers-visual {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .layer {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            border: 2px solid #334155;
+            border-radius: 12px;
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .layer:hover {
+            border-color: #3b82f6;
+            transform: translateX(10px);
+        }
+
+        .layer-number {
+            width: 50px;
+            height: 50px;
+            background: #3b82f6;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .layer-content {
+            flex: 1;
+        }
+
+        .layer-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: 8px;
+        }
+
+        .layer-desc {
+            font-size: 14px;
+            color: #94a3b8;
+            line-height: 1.6;
+        }
+
+        .layer-status {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            border: 1px solid #22c55e;
+        }
+
+        /* PII Masking Demo */
+        .pii-demo {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .demo-panel {
+            background: #1e293b;
+            border: 2px solid #334155;
+            border-radius: 16px;
+            padding: 30px;
+        }
+
+        .demo-panel.unsafe {
+            border-color: #ef4444;
+        }
+
+        .demo-panel.safe {
+            border-color: #22c55e;
+        }
+
+        .demo-panel h3 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .demo-panel.unsafe h3 {
+            color: #ef4444;
+        }
+
+        .demo-panel.safe h3 {
+            color: #22c55e;
+        }
+
+        .code-sample {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.8;
+            margin-bottom: 16px;
+            color: #cbd5e1;
+        }
+
+        .pii-highlight {
+            background: rgba(239, 68, 68, 0.3);
+            padding: 2px 6px;
+            border-radius: 4px;
+            border-bottom: 2px solid #ef4444;
+            font-weight: 700;
+        }
+
+        .token-highlight {
+            background: rgba(34, 197, 94, 0.3);
+            padding: 2px 6px;
+            border-radius: 4px;
+            border-bottom: 2px solid #22c55e;
+            font-weight: 700;
+        }
+
+        .info-box {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid #3b82f6;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 12px;
+            color: #cbd5e1;
+        }
+
+        /* Audit Log */
+        .audit-log {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 40px;
+        }
+
+        .audit-log h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #f1f5f9;
+        }
+
+        .log-entries {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .log-entry {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 16px;
+            display: grid;
+            grid-template-columns: 120px 200px 1fr 100px;
+            gap: 16px;
+            align-items: center;
+            font-size: 13px;
+            transition: all 0.3s ease;
+        }
+
+        .log-entry:hover {
+            border-color: #3b82f6;
+            background: #1e293b;
+        }
+
+        .log-timestamp {
+            color: #64748b;
+            font-family: 'Courier New', monospace;
+        }
+
+        .log-action {
+            color: #94a3b8;
+        }
+
+        .log-details {
+            color: #cbd5e1;
+        }
+
+        .log-status {
+            text-align: right;
+        }
+
+        .status-success {
+            color: #22c55e;
+            font-weight: 600;
+        }
+
+        .status-warning {
+            color: #eab308;
+            font-weight: 600;
+        }
+
+        /* Encryption Flow */
+        .encryption-flow {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 16px;
+            padding: 40px;
+            margin-bottom: 40px;
+        }
+
+        .encryption-flow h2 {
+            font-size: 24px;
+            margin-bottom: 30px;
+            text-align: center;
+            color: #f1f5f9;
+        }
+
+        .flow-steps {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+
+        .flow-step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+        }
+
+        .flow-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 16px;
+            background: #0f172a;
+            border: 3px solid #3b82f6;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            transition: all 0.3s ease;
+        }
+
+        .flow-step:hover .flow-icon {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+        }
+
+        .flow-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #cbd5e1;
+            margin-bottom: 8px;
+        }
+
+        .flow-detail {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .flow-arrow {
+            position: absolute;
+            top: 40px;
+            left: 50%;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #3b82f6 0%, transparent 100%);
+            z-index: -1;
+        }
+
+        .flow-step:last-child .flow-arrow {
+            display: none;
+        }
+
+        /* Best Practices */
+        .best-practices {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .practice-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .practice-card:hover {
+            border-color: #22c55e;
+            transform: translateY(-5px);
+        }
+
+        .practice-icon {
+            font-size: 40px;
+            margin-bottom: 16px;
+        }
+
+        .practice-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: 8px;
+        }
+
+        .practice-desc {
+            font-size: 13px;
+            color: #94a3b8;
+            line-height: 1.6;
+        }
+
+        .check-list {
+            margin-top: 12px;
+            font-size: 12px;
+        }
+
+        .check-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+            color: #cbd5e1;
+        }
+
+        .check-icon {
+            color: #22c55e;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Security & Compliance Architecture</h1>
+            <p>HIPAA-compliant AI processing with zero-retention PII masking</p>
+        </div>
+
+        <!-- Compliance Badges -->
+        <div class="compliance-badges">
+            <div class="badge">
+                <div class="badge-icon">🛡️</div>
+                <div class="badge-info">
+                    <h3>HIPAA Compliant</h3>
+                    <p>Protected Health Information</p>
+                </div>
+            </div>
+            <div class="badge">
+                <div class="badge-icon">🔒</div>
+                <div class="badge-info">
+                    <h3>SOC 2 Type II</h3>
+                    <p>Security & Availability</p>
+                </div>
+            </div>
+            <div class="badge">
+                <div class="badge-icon">✅</div>
+                <div class="badge-info">
+                    <h3>Zero Retention</h3>
+                    <p>No PII in AI Logs</p>
+                </div>
+            </div>
+            <div class="badge">
+                <div class="badge-icon">🔐</div>
+                <div class="badge-info">
+                    <h3>End-to-End Encrypted</h3>
+                    <p>TLS 1.3 + AES-256</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Security Layers -->
+        <div class="security-layers">
+            <h2>Defense in Depth: 7-Layer Security Model</h2>
+            <div class="layers-visual">
+                <div class="layer">
+                    <div class="layer-number">1</div>
+                    <div class="layer-content">
+                        <div class="layer-title">Network Security</div>
+                        <div class="layer-desc">VPN-only access, firewall rules, DDoS protection, IP whitelisting for API endpoints</div>
+                    </div>
+                    <div class="layer-status">✓ Active</div>
+                </div>
+
+                <div class="layer">
+                    <div class="layer-number">2</div>
+                    <div class="layer-content">
+                        <div class="layer-title">Authentication & Authorization</div>
+                        <div class="layer-desc">JWT tokens with 15-min expiry, role-based access control (RBAC), MFA for admin accounts</div>
+                    </div>
+                    <div class="layer-status">✓ Active</div>
+                </div>
+
+                <div class="layer">
+                    <div class="layer-number">3</div>
+                    <div class="layer-content">
+                        <div class="layer-title">Transport Encryption</div>
+                        <div class="layer-desc">TLS 1.3 for all connections, certificate pinning, HSTS headers enforced</div>
+                    </div>
+                    <div class="layer-status">✓ Active</div>
+                </div>
+
+                <div class="layer">
+                    <div class="layer-number">4</div>
+                    <div class="layer-content">
+                        <div class="layer-title">PII Masking Layer</div>
+                        <div class="layer-desc">Tokenization before AI processing - names, DOBs, SSNs, policy numbers replaced with reversible tokens</div>
+                    </div>
+                    <div class="layer-status">✓ Active</div>
+                </div>
+
+                <div class="layer">
+                    <div class="layer-number">5</div>
+                    <div class="layer-content">
+                        <div class="layer-title">AI Processing Boundary</div>
+                        <div class="layer-desc">Zero-retention policy - OpenAI API configured to not store any data, all requests logged without PII</div>
+                    </div>
+                    <div class="layer-status">✓ Active</div>
+                </div>
+
+                <div class="layer">
+                    <div class="layer-number">6</div>
+                    <div class="layer-content">
+                        <div class="layer-title">Data at Rest Encryption</div>
+                        <div class="layer-desc">AES-256 encryption for database, separate keys for each environment, automated key rotation</div>
+                    </div>
+                    <div class="layer-status">✓ Active</div>
+                </div>
+
+                <div class="layer">
+                    <div class="layer-number">7</div>
+                    <div class="layer-content">
+                        <div class="layer-title">Audit & Monitoring</div>
+                        <div class="layer-desc">Real-time logging of all data access, automated alerts for anomalies, 90-day retention policy</div>
+                    </div>
+                    <div class="layer-status">✓ Active</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PII Masking Demo -->
+        <div class="pii-demo">
+            <div class="demo-panel unsafe">
+                <h3>
+                    <span>⚠️</span>
+                    Unsafe: Raw PII Sent to AI
+                </h3>
+                <div class="code-sample">
+{
+  "text": "Patient <span class="pii-highlight">John Smith</span>, DOB <span class="pii-highlight">03/15/1975</span>,
+  SSN <span class="pii-highlight">***-**-1234</span>, Policy #<span class="pii-highlight">INS-2024-8832</span>
+  visited ER for chest pain..."
+}
+                </div>
+                <div class="info-box">
+                    ❌ <strong>HIPAA Violation:</strong> Protected Health Information (PHI) exposed to third-party AI service. Cannot guarantee data deletion from vendor logs.
+                </div>
+            </div>
+
+            <div class="demo-panel safe">
+                <h3>
+                    <span>✅</span>
+                    Safe: Tokenized PII
+                </h3>
+                <div class="code-sample">
+{
+  "text": "Patient <span class="token-highlight">[NAME_TOKEN_A7F3]</span>, DOB <span class="token-highlight">[DOB_TOKEN_B2C8]</span>,
+  SSN <span class="token-highlight">[SSN_TOKEN_D9E1]</span>, Policy #<span class="token-highlight">[POL_TOKEN_F4A6]</span>
+  visited ER for chest pain..."
+}
+                </div>
+                <div class="info-box">
+                    ✅ <strong>HIPAA Compliant:</strong> All PII masked before AI processing. Tokens are re-hydrated only in secure backend after response. AI never sees real identifiers.
+                </div>
+            </div>
+        </div>
+
+        <!-- Audit Log -->
+        <div class="audit-log">
+            <h2>Live Security Audit Log</h2>
+            <div class="log-entries">
+                <div class="log-entry">
+                    <div class="log-timestamp">2024-12-28 14:32</div>
+                    <div class="log-action">PII_MASK_APPLIED</div>
+                    <div class="log-details">Claim CLM-8832: 4 PII fields tokenized</div>
+                    <div class="log-status status-success">✓ Success</div>
+                </div>
+                <div class="log-entry">
+                    <div class="log-timestamp">2024-12-28 14:32</div>
+                    <div class="log-action">AI_REQUEST_SENT</div>
+                    <div class="log-details">OpenAI API: 0 PII fields in payload</div>
+                    <div class="log-status status-success">✓ Success</div>
+                </div>
+                <div class="log-entry">
+                    <div class="log-timestamp">2024-12-28 14:33</div>
+                    <div class="log-action">RESPONSE_RECEIVED</div>
+                    <div class="log-details">Confidence: 0.94, Status: Approved</div>
+                    <div class="log-status status-success">✓ Success</div>
+                </div>
+                <div class="log-entry">
+                    <div class="log-timestamp">2024-12-28 14:33</div>
+                    <div class="log-action">PII_REHYDRATED</div>
+                    <div class="log-details">Tokens replaced with original data</div>
+                    <div class="log-status status-success">✓ Success</div>
+                </div>
+                <div class="log-entry">
+                    <div class="log-timestamp">2024-12-28 14:34</div>
+                    <div class="log-action">ACCESS_GRANTED</div>
+                    <div class="log-details">User: admin@company.com, Role: Claims Manager</div>
+                    <div class="log-status status-success">✓ Success</div>
+                </div>
+                <div class="log-entry">
+                    <div class="log-timestamp">2024-12-28 14:35</div>
+                    <div class="log-action">ANOMALY_DETECTED</div>
+                    <div class="log-details">Unusual access pattern from IP 192.168.1.100</div>
+                    <div class="log-status status-warning">⚠ Review</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Encryption Flow -->
+        <div class="encryption-flow">
+            <h2>End-to-End Encryption Flow</h2>
+            <div class="flow-steps">
+                <div class="flow-step">
+                    <div class="flow-icon">💻</div>
+                    <div class="flow-arrow"></div>
+                    <div class="flow-label">Client Browser</div>
+                    <div class="flow-detail">TLS 1.3 initiated</div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-icon">🔐</div>
+                    <div class="flow-arrow"></div>
+                    <div class="flow-label">Transit</div>
+                    <div class="flow-detail">Encrypted payload</div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-icon">⚙️</div>
+                    <div class="flow-arrow"></div>
+                    <div class="flow-label">FastAPI</div>
+                    <div class="flow-detail">JWT validated</div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-icon">🎭</div>
+                    <div class="flow-arrow"></div>
+                    <div class="flow-label">Masking</div>
+                    <div class="flow-detail">PII tokenized</div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-icon">🤖</div>
+                    <div class="flow-label">AI Processing</div>
+                    <div class="flow-detail">Zero retention</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Best Practices -->
+        <div class="best-practices">
+            <div class="practice-card">
+                <div class="practice-icon">🔍</div>
+                <div class="practice-title">Zero Trust Architecture</div>
+                <div class="practice-desc">Every request is authenticated and authorized, regardless of source.</div>
+                <div class="check-list">
+                    <div class="check-item"><span class="check-icon">✓</span> No implicit trust</div>
+                    <div class="check-item"><span class="check-icon">✓</span> Verify every access</div>
+                    <div class="check-item"><span class="check-icon">✓</span> Least privilege principle</div>
+                </div>
+            </div>
+
+            <div class="practice-card">
+                <div class="practice-icon">📝</div>
+                <div class="practice-title">Comprehensive Logging</div>
+                <div class="practice-desc">All data access and modifications tracked for audit compliance.</div>
+                <div class="check-list">
+                    <div class="check-item"><span class="check-icon">✓</span> 90-day retention</div>
+                    <div class="check-item"><span class="check-icon">✓</span> Immutable logs</div>
+                    <div class="check-item"><span class="check-icon">✓</span> Real-time alerts</div>
+                </div>
+            </div>
+
+            <div class="practice-card">
+                <div class="practice-icon">🔄</div>
+                <div class="practice-title">Regular Security Audits</div>
+                <div class="practice-desc">Quarterly penetration testing and compliance reviews.</div>
+                <div class="check-list">
+                    <div class="check-item"><span class="check-icon">✓</span> Automated scans</div>
+                    <div class="check-item"><span class="check-icon">✓</span> Third-party audits</div>
+                    <div class="check-item"><span class="check-icon">✓</span> Vulnerability patching</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
