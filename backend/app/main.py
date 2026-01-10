@@ -69,15 +69,29 @@ async def rate_limit(request: Request, call_next):
 async def log_requests(request: Request, call_next):
     """Log all requests with timing, metrics, and audit trail."""
     from app.core.monitoring import increment_counter, record_gauge, metrics
-    from app.middleware.audit import audit_log_middleware
+    from datetime import datetime
+    import json
     
-    # Combine audit and metrics logging
-    start_time = time.time()
+    # Audit logging - extract user info
+    start_time = datetime.utcnow()
+    user_id = None
+    if hasattr(request.state, "user"):
+        user_id = request.state.user.get("username")
     
-    # Audit logging
-    response = await audit_log_middleware(request, call_next)
+    # Log request (without PII)
+    audit_data = {
+        "timestamp": start_time.isoformat(),
+        "method": request.method,
+        "path": request.url.path,
+        "user_id": user_id or "anonymous",
+        "ip_address": request.client.host if request.client else None,
+    }
+    logger.info(f"AUDIT: {json.dumps(audit_data)}")
     
-    process_time = time.time() - start_time
+    # Process request
+    process_start = time.time()
+    response = await call_next(request)
+    process_time = time.time() - process_start
     
     # Update metrics
     increment_counter("requests_total")
@@ -89,6 +103,15 @@ async def log_requests(request: Request, call_next):
     current_avg = metrics["average_response_time_ms"]
     new_avg = ((current_avg * (total_requests - 1)) + (process_time * 1000)) / total_requests
     record_gauge("average_response_time_ms", new_avg)
+    
+    # Log completion
+    end_time = datetime.utcnow()
+    audit_data.update({
+        "status_code": response.status_code,
+        "duration_ms": process_time * 1000,
+        "completed_at": end_time.isoformat()
+    })
+    logger.info(f"AUDIT_COMPLETE: {json.dumps(audit_data)}")
     
     logger.info(
         f"{request.method} {request.url.path} - "

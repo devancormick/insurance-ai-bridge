@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { Providers } from './providers'
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary'
+import { Navbar } from '@/components/shared/Navbar'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -20,7 +21,12 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <ErrorBoundary>
-          <Providers>{children}</Providers>
+          <Providers>
+            <Navbar />
+            <main className="min-h-screen">
+              {children}
+            </main>
+          </Providers>
         </ErrorBoundary>
       </body>
     </html>
