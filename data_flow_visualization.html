@@ -461,11 +461,11 @@
                 <div class="stage-title">Raw Input</div>
                 <div class="stage-desc">Unstructured claim notes from legacy system</div>
                 <div class="data-display">
-Patient visited ER on 11/15/2024
+Patient visited ER on 11/15/2025
 for chest pain. Diagnosis: ACS.
 Policy: John Smith, DOB 03/15/75
 Total: $12,450
-Policy #INS-2024-8832
+Policy #INS-2025-8832
                 </div>
             </div>
 
@@ -475,7 +475,7 @@ Policy #INS-2024-8832
                 <div class="stage-title">PII Masking</div>
                 <div class="stage-desc">Sensitive data replaced with tokens</div>
                 <div class="data-display">
-Patient visited ER on 11/15/2024
+Patient visited ER on 11/15/2025
 for chest pain. Diagnosis: ACS.
 Policy: <span class="string">[NAME_TOKEN_1]</span>
 DOB: <span class="string">[DOB_TOKEN_1]</span>
@@ -491,7 +491,7 @@ Policy #<span class="string">[POLICY_TOKEN_1]</span>
                 <div class="stage-desc">LLM extracts structured entities</div>
                 <div class="data-display">
 {
-  <span class="key">"visit_date"</span>: <span class="string">"2024-11-15"</span>,
+  <span class="key">"visit_date"</span>: <span class="string">"2025-11-15"</span>,
   <span class="key">"diagnosis"</span>: <span class="string">"ACS"</span>,
   <span class="key">"amount"</span>: <span class="number">12450</span>,
   <span class="key">"service_type"</span>: <span class="string">"emergency"</span>
@@ -506,7 +506,7 @@ Policy #<span class="string">[POLICY_TOKEN_1]</span>
                 <div class="stage-desc">Pydantic schema enforcement</div>
                 <div class="data-display">
 {
-  <span class="key">"claim_id"</span>: <span class="string">"CLM-2024-8832"</span>,
+  <span class="key">"claim_id"</span>: <span class="string">"CLM-2025-8832"</span>,
   <span class="key">"status"</span>: <span class="string">"approved"</span>,
   <span class="key">"confidence"</span>: <span class="number">0.94</span>,
   <span class="key">"validated"</span>: <span class="boolean">true</span>
@@ -580,7 +580,7 @@ Policy #<span class="string">[POLICY_TOKEN_1]</span>
             <div class="comparison-card before">
                 <h2><span class="icon">❌</span> Before: Manual Processing</h2>
                 <div class="text-sample">
-                    Staff member reads: "<span class="highlight-pii">Patient John Smith, DOB 03/15/1975</span>, visited ER on 11/15/2024 for chest pain. Diagnosis: Acute coronary syndrome. Total charges: $12,450. Claim submitted under policy #<span class="highlight-pii">INS-2024-8832</span>..."
+                    Staff member reads: "<span class="highlight-pii">Patient John Smith, DOB 03/15/1975</span>, visited ER on 11/15/2025 for chest pain. Diagnosis: Acute coronary syndrome. Total charges: $12,450. Claim submitted under policy #<span class="highlight-pii">INS-2025-8832</span>..."
                     <br><br>
                     Then manually:
                     <br>• Opens 3 different screens
