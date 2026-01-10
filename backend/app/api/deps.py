@@ -72,7 +72,7 @@ async def get_current_user_optional(token: Optional[str] = Depends(oauth2_scheme
         from app.models.user import User
         from sqlalchemy import select
         
-        result = await session.execute(
+        result = await db.execute(
             select(User).where(User.username == username)
         )
         user_orm = result.scalar_one_or_none()
