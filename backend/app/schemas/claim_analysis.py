@@ -1,5 +1,5 @@
 """Pydantic schemas for claim analysis."""
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 from typing import Literal, Optional, List
 from datetime import datetime
 
@@ -57,13 +57,12 @@ class ClaimAnalysis(BaseModel):
     # Token usage
     tokens_used: int = Field(..., ge=0)
     
-    @field_validator('denial_reason')
-    @classmethod
-    def denial_reason_required_when_denied(cls, v, info):
+    @model_validator(mode='after')
+    def denial_reason_required_when_denied(self):
         """Validate that denial_reason is provided when status is denied."""
-        if info.data.get('status') == 'denied' and not v:
+        if self.status == 'denied' and not self.denial_reason:
             raise ValueError('denial_reason required when status is denied')
-        return v
+        return self
 
 
 class ClaimAnalysisResponse(BaseModel):

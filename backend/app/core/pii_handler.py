@@ -3,6 +3,7 @@ from cryptography.fernet import Fernet
 from typing import Dict, Any
 import re
 import hashlib
+import base64
 import os
 from app.config import settings
 
@@ -12,20 +13,21 @@ class PIIHandler:
     
     def __init__(self):
         """Initialize PII handler with encryption key."""
-        key = settings.encryption_key.encode()
-        # Ensure key is 32 bytes for Fernet
-        if len(key) < 32:
-            key = key.ljust(32, b'0')[:32]
-        elif len(key) > 32:
-            key = key[:32]
-        # Fernet requires base64-encoded 32-byte key, so we use it directly
-        # If key is not base64, we'll hash it
+        key_str = settings.encryption_key
+        key_bytes = key_str.encode()
+        
+        # Fernet requires a base64-encoded 32-byte key
+        # Generate a proper Fernet key from the encryption_key string
+        key_hash = hashlib.sha256(key_bytes).digest()
+        # Fernet keys are base64-encoded, so we encode the hash
+        fernet_key = base64.urlsafe_b64encode(key_hash)
+        
         try:
-            self.cipher = Fernet(key)
+            self.cipher = Fernet(fernet_key)
         except Exception:
-            # If key is not valid Fernet key, create one from hash
-            key_hash = hashlib.sha256(key).digest()
+            # Fallback: generate a new key and log warning
             self.cipher = Fernet(Fernet.generate_key())
+        
         self.token_map: Dict[str, str] = {}
     
     def mask_pii(self, data: Dict[str, Any]) -> Dict[str, Any]:

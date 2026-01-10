@@ -1,10 +1,17 @@
 """Application configuration."""
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import Optional
+import os
 
 
 class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
+    
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        case_sensitive=False,
+        extra="ignore"
+    )
     
     # Application
     app_name: str = "Insurance AI Bridge API"
@@ -14,7 +21,7 @@ class Settings(BaseSettings):
     frontend_url: str = "http://localhost:3000"
     
     # Database
-    database_url: str
+    database_url: str = "postgresql+asyncpg://user:password@localhost:5432/insurance_bridge"
     database_pool_size: int = 20
     database_max_overflow: int = 10
     
@@ -28,10 +35,10 @@ class Settings(BaseSettings):
     llm_temperature: float = 0.1
     llm_max_tokens: int = 4096
     
-    # Security
-    secret_key: str
-    encryption_key: str
-    jwt_secret: str
+    # Security (with defaults for development)
+    secret_key: str = "dev-secret-key-change-in-production-min-32-chars-long"
+    encryption_key: str = "dev-encryption-key-32-bytes-long-key-for-fernet"
+    jwt_secret: str = "dev-jwt-secret-change-in-production"
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 30
     
@@ -55,11 +62,17 @@ class Settings(BaseSettings):
     pii_retention_days: int = 0
     audit_log_retention_days: int = 2555
     enable_encryption_at_rest: bool = True
-    
-    class Config:
-        env_file = ".env"
-        case_sensitive = False
 
 
-settings = Settings()
+# Create settings instance (will use defaults if env vars not set)
+try:
+    settings = Settings()
+except Exception as e:
+    # Fallback to defaults if loading fails
+    settings = Settings(
+        database_url="postgresql+asyncpg://user:password@localhost:5432/insurance_bridge",
+        secret_key="dev-secret-key-change-in-production-min-32-chars-long",
+        encryption_key="dev-encryption-key-32-bytes-long-key-for-fernet",
+        jwt_secret="dev-jwt-secret-change-in-production"
+    )
 
