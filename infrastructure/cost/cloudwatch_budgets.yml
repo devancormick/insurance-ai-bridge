@@ -1,0 +1,77 @@
+# AWS Budget Alerts Configuration
+# Cloud cost monitoring and alerting
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cost-monitoring-config
+  namespace: insurance-ai-bridge
+data:
+  budget-alerts.sh: |
+    #!/bin/bash
+    # Budget alert script for AWS CloudWatch
+    
+    # Monthly budget threshold (in USD)
+    BUDGET_AMOUNT=50000
+    ALERT_THRESHOLD_50=0.5
+    ALERT_THRESHOLD_75=0.75
+    ALERT_THRESHOLD_90=0.9
+    ALERT_THRESHOLD_100=1.0
+    
+    # Get current month spending
+    CURRENT_SPENDING=$(aws ce get-cost-and-usage \
+      --time-period Start=$(date -d "$(date +%Y-%m-01)" +%Y-%m-%d),End=$(date +%Y-%m-%d) \
+      --granularity MONTHLY \
+      --metrics BlendedCost \
+      --query 'ResultsByTime[0].Total.BlendedCost.Amount' \
+      --output text)
+    
+    # Calculate percentage
+    PERCENTAGE=$(echo "scale=2; $CURRENT_SPENDING / $BUDGET_AMOUNT * 100" | bc)
+    
+    # Send alerts based on thresholds
+    if (( $(echo "$PERCENTAGE >= 100" | bc -l) )); then
+      echo "CRITICAL: Budget exceeded! Current spending: $CURRENT_SPENDING / $BUDGET_AMOUNT (${PERCENTAGE}%)"
+      # Send critical alert (PagerDuty, email, etc.)
+    elif (( $(echo "$PERCENTAGE >= 90" | bc -l) )); then
+      echo "WARNING: Budget at 90%! Current spending: $CURRENT_SPENDING / $BUDGET_AMOUNT (${PERCENTAGE}%)"
+      # Send warning alert
+    elif (( $(echo "$PERCENTAGE >= 75" | bc -l) )); then
+      echo "INFO: Budget at 75%! Current spending: $CURRENT_SPENDING / $BUDGET_AMOUNT (${PERCENTAGE}%)"
+      # Send info alert
+    elif (( $(echo "$PERCENTAGE >= 50" | bc -l) )); then
+      echo "INFO: Budget at 50%! Current spending: $CURRENT_SPENDING / $BUDGET_AMOUNT (${PERCENTAGE}%)"
+    fi
+
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cost-monitoring
+  namespace: insurance-ai-bridge
+spec:
+  schedule: "0 * * * *"  # Every hour
+  successfulJobsHistoryLimit: 24
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: cost-monitor
+            image: amazon/aws-cli:latest
+            command:
+            - /bin/bash
+            - /scripts/budget-alerts.sh
+            volumeMounts:
+            - name: scripts
+              mountPath: /scripts
+            env:
+            - name: AWS_REGION
+              value: us-east-1
+          volumes:
+          - name: scripts
+            configMap:
+              name: cost-monitoring-config
+          restartPolicy: OnFailure
+
