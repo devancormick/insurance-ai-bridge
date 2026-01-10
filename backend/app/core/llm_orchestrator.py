@@ -51,24 +51,38 @@ class LLMOrchestrator:
         Returns:
             ClaimAnalysis object with structured results
         """
+        from app.core.monitoring import increment_counter, metrics
+        
         claim_id = masked_data.get("claim_id", "UNKNOWN")
         
         # Try OpenAI first, fallback to Anthropic, then mock
         if self.openai_client:
             try:
-                return await self._analyze_with_openai(masked_data)
+                increment_counter("llm_calls_total", {"provider": "openai"})
+                result = await self._analyze_with_openai(masked_data)
+                metrics["llm_tokens_used"] += result.tokens_used
+                return result
             except Exception as e:
+                increment_counter("llm_errors")
                 logger.error(f"OpenAI analysis failed: {e}")
                 if self.anthropic_client:
                     try:
-                        return await self._analyze_with_anthropic(masked_data)
+                        increment_counter("llm_calls_total", {"provider": "anthropic"})
+                        result = await self._analyze_with_anthropic(masked_data)
+                        metrics["llm_tokens_used"] += result.tokens_used
+                        return result
                     except Exception as e2:
+                        increment_counter("llm_errors")
                         logger.error(f"Anthropic analysis failed: {e2}")
         
         if self.anthropic_client:
             try:
-                return await self._analyze_with_anthropic(masked_data)
+                increment_counter("llm_calls_total", {"provider": "anthropic"})
+                result = await self._analyze_with_anthropic(masked_data)
+                metrics["llm_tokens_used"] += result.tokens_used
+                return result
             except Exception as e:
+                increment_counter("llm_errors")
                 logger.error(f"Anthropic analysis failed: {e}")
         
         # Fallback to mock response if no LLM available

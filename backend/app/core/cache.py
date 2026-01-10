@@ -40,24 +40,33 @@ class Cache:
         Returns:
             Cached value or None
         """
+        from app.core.monitoring import increment_counter
+        
         if self._is_redis_available and self.redis_client:
             try:
                 value = await self.redis_client.get(key)
                 if value:
+                    increment_counter("cache_hits")
                     try:
                         return json.loads(value)
                     except json.JSONDecodeError:
                         return value
+                increment_counter("cache_misses")
             except Exception as e:
                 logger.error(f"Error getting from Redis cache: {e}")
+                increment_counter("cache_misses")
         
         # Fallback to in-memory cache
         if key in self.in_memory_cache:
             value, expiry = self.in_memory_cache[key]
             if expiry is None or expiry > asyncio.get_event_loop().time():
+                increment_counter("cache_hits")
                 return value
             else:
                 del self.in_memory_cache[key]
+                increment_counter("cache_misses")
+        else:
+            increment_counter("cache_misses")
         
         return None
     

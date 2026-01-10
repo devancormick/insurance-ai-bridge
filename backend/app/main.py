@@ -67,10 +67,23 @@ async def rate_limit(request: Request, call_next):
 # Request logging middleware
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
-    """Log all requests with timing."""
+    """Log all requests with timing and metrics."""
+    from app.core.monitoring import increment_counter, record_gauge, metrics
+    
     start_time = time.time()
     response = await call_next(request)
     process_time = time.time() - start_time
+    
+    # Update metrics
+    increment_counter("requests_total")
+    increment_counter("requests_by_status", {"status": str(response.status_code)})
+    increment_counter("requests_by_endpoint", {"endpoint": request.url.path})
+    
+    # Update average response time
+    total_requests = metrics["requests_total"]
+    current_avg = metrics["average_response_time_ms"]
+    new_avg = ((current_avg * (total_requests - 1)) + (process_time * 1000)) / total_requests
+    record_gauge("average_response_time_ms", new_avg)
     
     logger.info(
         f"{request.method} {request.url.path} - "
@@ -111,6 +124,8 @@ async def health_check():
     Returns:
         Health status of all services
     """
+    from app.core.monitoring import get_health_metrics
+    
     health_status = {
         "status": "healthy",
         "timestamp": time.time(),
@@ -119,7 +134,8 @@ async def health_check():
             "database": "unknown",
             "cache": "unknown",
             "llm": "unknown"
-        }
+        },
+        "metrics": get_health_metrics()
     }
     
     # Check cache
@@ -148,6 +164,19 @@ async def health_check():
         health_status["status"] = "degraded"
     
     return health_status
+
+
+@app.get("/metrics")
+async def get_metrics():
+    """
+    Get application metrics (Prometheus-compatible).
+    
+    Returns:
+        Application metrics dictionary
+    """
+    from app.core.monitoring import get_metrics
+    
+    return get_metrics()
 
 
 @app.on_event("startup")

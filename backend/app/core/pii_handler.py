@@ -94,5 +94,11 @@ class PIIHandler:
     
     def clear_tokens(self):
         """Clear token map after processing (zero retention)."""
+        from app.core.monitoring import increment_counter
+        
+        token_count = len(self.token_map)
         self.token_map.clear()
+        
+        if token_count > 0:
+            increment_counter("pii_tokens_cleared", {"count": str(token_count)})
 
