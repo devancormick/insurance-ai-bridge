@@ -145,5 +145,5 @@ npm run build            # Test build
 
 ## Questions?
 
-For questions or concerns, please open an issue on GitHub or contact the maintainers.
+For questions or concerns, please open an issue on GitHub.
 

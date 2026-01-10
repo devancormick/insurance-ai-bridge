@@ -10,8 +10,8 @@ echo "📦 Verifying Git repository..."
 if [ ! -d ".git" ]; then
     echo "Initializing Git repository..."
     git init
-    git config user.name "devancormick"
-    git config user.email "devancormick@outlook.com"
+    git config user.name "devancormik"
+    git config user.email "devancormik@users.noreply.github.com"
     git branch -M main
 fi
 
@@ -53,8 +53,4 @@ echo "Next steps:"
 echo "1. Edit .env file with your credentials"
 echo "2. Run: docker-compose up -d"
 echo "3. Open Cursor AI and start development"
-echo ""
-echo "Git is configured with local user:"
-echo "  Name:  devancormick"
-echo "  Email: devancormick@outlook.com"
 

@@ -113,13 +113,6 @@ cd frontend
 npm test
 ```
 
-## Git Workflow
-
-This project uses a specific Git commit schedule with local user configuration:
-- **User:** devancormick
-- **Email:** devancormick@outlook.com
-- **Commit Format:** `[COMPONENT] Action: Description`
-
 See the full project guideline document for the complete daily commit schedule.
 
 ## Security & HIPAA Compliance
