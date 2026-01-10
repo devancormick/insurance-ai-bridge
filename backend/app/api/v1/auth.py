@@ -91,7 +91,35 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     return user
 
 
-@router.post("/login", response_model=Token)
+@router.post(
+    "/login",
+    response_model=Token,
+    summary="User authentication",
+    description="""
+    Authenticate a user and receive a JWT access token.
+    
+    **Rate Limit**: 5 requests per minute per IP (stricter than general API limits)
+    
+    **Security**: Passwords are hashed using bcrypt. Tokens expire after 30 minutes by default.
+    """,
+    responses={
+        200: {
+            "description": "Authentication successful",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                        "token_type": "bearer",
+                        "expires_in": 1800
+                    }
+                }
+            }
+        },
+        401: {"description": "Invalid credentials"},
+        429: {"description": "Rate limit exceeded"}
+    },
+    tags=["authentication"]
+)
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     """
     Authenticate user and return JWT token.
@@ -136,7 +164,33 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     }
 
 
-@router.get("/me")
+@router.get(
+    "/me",
+    summary="Get current user information",
+    description="""
+    Get information about the currently authenticated user.
+    
+    Requires valid JWT token in Authorization header.
+    """,
+    responses={
+        200: {
+            "description": "User information",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "username": "admin",
+                        "email": "admin@example.com",
+                        "full_name": "Administrator",
+                        "disabled": False
+                    }
+                }
+            }
+        },
+        401: {"description": "Not authenticated"},
+        403: {"description": "Account disabled"}
+    },
+    tags=["authentication"]
+)
 async def read_users_me(current_user: dict = Depends(get_current_user)):
     """
     Get current user information.

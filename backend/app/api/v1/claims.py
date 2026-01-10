@@ -11,7 +11,48 @@ import time
 router = APIRouter()
 
 
-@router.post("/{claim_id}/analyze", response_model=ClaimAnalysisResponse)
+@router.post(
+    "/{claim_id}/analyze",
+    response_model=ClaimAnalysisResponse,
+    summary="Analyze a claim using AI",
+    description="""
+    Analyze an insurance claim using AI/LLM processing.
+    
+    This endpoint:
+    1. Aggregates claim data from multiple sources (legacy DB, SOAP API, SharePoint)
+    2. Masks PII (names, SSNs, DOBs) before sending to LLM
+    3. Sends masked data to LLM for analysis
+    4. Returns structured analysis with reasoning and policy references
+    
+    **PII Handling**: All PII is tokenized before LLM processing and tokens are cleared after (zero retention).
+    
+    **Rate Limit**: 50 requests per minute per IP
+    """,
+    responses={
+        200: {
+            "description": "Analysis completed successfully",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "success": True,
+                        "data": {
+                            "claim_id": "CLM-12345",
+                            "status": "approved",
+                            "confidence_score": 0.95,
+                            "recommended_action": "Approve claim",
+                            "tokens_used": 1250
+                        },
+                        "processing_time_ms": 1234
+                    }
+                }
+            }
+        },
+        404: {"description": "Claim not found"},
+        429: {"description": "Rate limit exceeded"},
+        500: {"description": "Internal server error"}
+    },
+    tags=["claims"]
+)
 async def analyze_claim(claim_id: str, request: ClaimAnalysisRequest) -> ClaimAnalysisResponse:
     """
     Analyze a claim using AI.

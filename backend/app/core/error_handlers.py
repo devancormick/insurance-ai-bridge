@@ -5,6 +5,7 @@ from fastapi.exceptions import RequestValidationError
 from sqlalchemy.exc import SQLAlchemyError
 from pydantic import ValidationError
 from app.core.exceptions import InsuranceAIBridgeException
+from app.config import settings
 from app.utils.logging import logger
 import traceback
 

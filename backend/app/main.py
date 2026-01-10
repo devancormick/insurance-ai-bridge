@@ -21,10 +21,30 @@ import time
 app = FastAPI(
     title=settings.app_name,
     version=settings.app_version,
+    description="""
+    Insurance AI Bridge API - AI-powered claim analysis system.
+    
+    ## Features
+    
+    - **Claim Analysis**: Analyze insurance claims using AI/LLM
+    - **PII Protection**: Zero-retention PII handling with tokenization  
+    - **Data Aggregation**: Multi-source data integration
+    - **Authentication**: JWT-based authentication
+    
+    ## Quick Start
+    
+    1. Authenticate: `POST /api/v1/auth/login`
+    2. Analyze claim: `POST /api/v1/claims/{claim_id}/analyze`
+    3. Check health: `GET /health`
+    """,
     docs_url="/docs",
     redoc_url="/redoc",
     openapi_url="/api/v1/openapi.json",
 )
+
+# Use custom OpenAPI schema
+from app.api.v1.docs import custom_openapi_schema
+app.openapi = custom_openapi_schema
 
 # CORS middleware
 app.add_middleware(
