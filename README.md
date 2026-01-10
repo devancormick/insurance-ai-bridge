@@ -1,9 +1,6 @@
 # Insurance AI Bridge System
 
 **Project Name:** Insurance AI Bridge System  
-**Developer:** Devan McCormick (devancormick@outlook.com)  
-**Timeline:** December 1, 2024 - December 28, 2024  
-**Timezone:** CST (Central Standard Time)
 
 ## Project Overview
 
@@ -144,8 +141,3 @@ This system is designed with HIPAA compliance in mind:
 ## License
 
 Proprietary - Internal Use Only
-
-## Contact
-
-For questions or issues, contact Devan McCormick at devancormick@outlook.com
-
