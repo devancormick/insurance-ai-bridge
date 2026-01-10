@@ -1,0 +1,94 @@
+# PostgreSQL Backup Job Configuration
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: postgres-full-backup
+  namespace: insurance-ai-bridge
+spec:
+  backoffLimit: 3
+  template:
+    spec:
+      containers:
+      - name: postgres-backup
+        image: postgres:15
+        env:
+        - name: PGHOST
+          valueFrom:
+            secretKeyRef:
+              name: database-credentials
+              key: host
+        - name: PGDATABASE
+          value: insurance_ai_bridge
+        - name: PGUSER
+          valueFrom:
+            secretKeyRef:
+              name: database-credentials
+              key: username
+        - name: PGPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: database-credentials
+              key: password
+        - name: BACKUP_BUCKET
+          value: "s3://insurance-ai-bridge-backups/full"
+        - name: BACKUP_RETENTION_DAYS
+          value: "2555"  # 7 years for HIPAA compliance
+        command:
+        - /bin/bash
+        - -c
+        - |
+          set -e
+          
+          BACKUP_FILE="full-backup-$(date +%Y%m%d-%H%M%S).sql.gz"
+          BACKUP_PATH="/tmp/$BACKUP_FILE"
+          
+          echo "Starting full database backup..."
+          pg_dump -Fc -v | gzip > $BACKUP_PATH
+          
+          echo "Uploading backup to S3..."
+          aws s3 cp $BACKUP_PATH $BACKUP_BUCKET/$BACKUP_FILE \
+            --storage-class GLACIER \
+            --metadata "backup-date=$(date -Iseconds),retention-days=$BACKUP_RETENTION_DAYS"
+          
+          echo "Verifying backup upload..."
+          if aws s3 ls $BACKUP_BUCKET/$BACKUP_FILE; then
+            echo "Backup uploaded successfully: $BACKUP_FILE"
+            
+            # Clean up old backups beyond retention period
+            echo "Cleaning up old backups..."
+            CUTOFF_DATE=$(date -d "$BACKUP_RETENTION_DAYS days ago" +%Y%m%d)
+            aws s3 ls $BACKUP_BUCKET/ | while read -r line; do
+              FILE_DATE=$(echo $line | awk '{print $1}' | tr -d '-')
+              FILE_NAME=$(echo $line | awk '{print $4}')
+              
+              if [ "$FILE_DATE" -lt "$CUTOFF_DATE" ]; then
+                echo "Deleting old backup: $FILE_NAME"
+                aws s3 rm $BACKUP_BUCKET/$FILE_NAME
+              fi
+            done
+            
+            # Clean up local file
+            rm -f $BACKUP_PATH
+          else
+            echo "ERROR: Backup verification failed!"
+            exit 1
+          fi
+          
+          echo "Backup completed successfully"
+        resources:
+          requests:
+            cpu: "1000m"
+            memory: "2Gi"
+          limits:
+            cpu: "2000m"
+            memory: "4Gi"
+        volumeMounts:
+        - name: backup-storage
+          mountPath: /tmp
+      volumes:
+      - name: backup-storage
+        emptyDir:
+          sizeLimit: 50Gi
+      restartPolicy: Never
+

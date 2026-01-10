@@ -1,0 +1,169 @@
+# Backend Deployment for On-Premise Kubernetes Cluster
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-onprem
+  namespace: insurance-ai-bridge-onprem
+  labels:
+    app: backend
+    tier: backend
+    environment: onprem
+spec:
+  replicas: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 2
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: backend
+      environment: onprem
+  template:
+    metadata:
+      labels:
+        app: backend
+        tier: backend
+        environment: onprem
+    spec:
+      containers:
+      - name: backend
+        image: insurance-ai-bridge-backend:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+          name: http
+          protocol: TCP
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: database-credentials-onprem
+              key: url
+        - name: DATABASE_POOLER_URL
+          value: "postgresql://pgbouncer-onprem.insurance-ai-bridge-onprem.svc.cluster.local:6432/insurance_ai_bridge"
+        - name: REDIS_URL
+          value: "redis://redis-master.insurance-ai-bridge-onprem.svc.cluster.local:6379"
+        - name: REDIS_SENTINEL_HOSTS
+          value: "redis-sentinel.insurance-ai-bridge-onprem.svc.cluster.local:26379"
+        - name: ENVIRONMENT
+          value: "onprem"
+        - name: DEPLOYMENT_TIER
+          value: "onprem"
+        - name: LEGACY_DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: legacy-db-config
+              key: host
+        - name: LEGACY_DB_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: legacy-db-config
+              key: port
+        - name: LEGACY_DB_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: legacy-db-config
+              key: database
+        - name: LEGACY_DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: legacy-db-credentials
+              key: username
+        - name: LEGACY_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: legacy-db-credentials
+              key: password
+        resources:
+          requests:
+            cpu: "1000m"
+            memory: "2Gi"
+          limits:
+            cpu: "2000m"
+            memory: "4Gi"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        volumeMounts:
+        - name: config
+          mountPath: /app/config
+        - name: logs
+          mountPath: /app/logs
+        - name: certificates
+          mountPath: /etc/ssl/certs
+          readOnly: true
+      volumes:
+      - name: config
+        configMap:
+          name: backend-config-onprem
+      - name: logs
+        emptyDir: {}
+      - name: certificates
+        secret:
+          secretName: onprem-certificates
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - backend
+              topologyKey: kubernetes.io/hostname
+      nodeSelector:
+        node-type: compute
+      tolerations:
+      - key: "onprem"
+        operator: "Equal"
+        value: "true"
+        effect: "NoSchedule"
+
+---
+# Backend Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-onprem
+  namespace: insurance-ai-bridge-onprem
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8000
+    targetPort: 8000
+    protocol: TCP
+    name: http
+  selector:
+    app: backend
+    environment: onprem
+
+---
+# Legacy Database ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: legacy-db-config
+  namespace: insurance-ai-bridge-onprem
+data:
+  host: "legacy-sql-server.internal.corp"
+  port: "1433"
+  database: "InsuranceLegacyDB"
+  connection_timeout: "30"
+  command_timeout: "60"
+

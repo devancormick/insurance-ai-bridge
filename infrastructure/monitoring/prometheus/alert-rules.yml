@@ -1,0 +1,111 @@
+# Prometheus Alert Rules
+groups:
+  - name: insurance_ai_bridge_alerts
+    interval: 30s
+    rules:
+      # High Error Rate Alert
+      - alert: HighErrorRate
+        expr: rate(http_requests_total{status=~"5.."}[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: critical
+          service: backend
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is {{ $value }} errors/second for the last 5 minutes"
+
+      # High Latency Alert
+      - alert: HighLatency
+        expr: histogram_quantile(0.99, rate(http_request_duration_seconds_bucket[5m])) > 2
+        for: 5m
+        labels:
+          severity: warning
+          service: backend
+        annotations:
+          summary: "High latency detected"
+          description: "P99 latency is {{ $value }}s"
+
+      # Database Connection Pool Exhausted
+      - alert: DatabasePoolExhausted
+        expr: database_connection_pool_active / database_connection_pool_max > 0.9
+        for: 2m
+        labels:
+          severity: critical
+          service: database
+        annotations:
+          summary: "Database connection pool nearly exhausted"
+          description: "{{ $value }}% of connections in use"
+
+      # Redis Memory Usage High
+      - alert: RedisMemoryHigh
+        expr: redis_memory_used_bytes / redis_memory_max_bytes > 0.9
+        for: 5m
+        labels:
+          severity: warning
+          service: redis
+        annotations:
+          summary: "Redis memory usage high"
+          description: "Redis is using {{ $value }}% of available memory"
+
+      # Service Down Alert
+      - alert: ServiceDown
+        expr: up{job=~"backend|frontend"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Service is down"
+          description: "{{ $labels.job }} is down"
+
+      # Disk Space Low
+      - alert: DiskSpaceLow
+        expr: (node_filesystem_avail_bytes / node_filesystem_size_bytes) < 0.1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Disk space low"
+          description: "Only {{ $value }}% disk space remaining"
+
+      # CPU Usage High
+      - alert: CPUUsageHigh
+        expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage"
+          description: "CPU usage is {{ $value }}%"
+
+      # Memory Usage High
+      - alert: MemoryUsageHigh
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage"
+          description: "Memory usage is {{ $value }}%"
+
+      # Backup Failure
+      - alert: BackupFailed
+        expr: backup_job_status{status="failed"} == 1
+        for: 0m
+        labels:
+          severity: critical
+          service: backup
+        annotations:
+          summary: "Database backup failed"
+          description: "Backup job {{ $labels.job_id }} failed"
+
+      # Replication Lag
+      - alert: ReplicationLagHigh
+        expr: database_replication_lag_seconds > 60
+        for: 5m
+        labels:
+          severity: warning
+          service: database
+        annotations:
+          summary: "High database replication lag"
+          description: "Replication lag is {{ $value }} seconds"
+

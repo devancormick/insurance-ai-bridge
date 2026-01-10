@@ -1,0 +1,211 @@
+# Data Synchronization Service for Hybrid Cloud
+# Handles CDC (Change Data Capture) and bi-directional sync
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: data-sync-service
+  namespace: insurance-ai-bridge
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: data-sync-service
+  template:
+    metadata:
+      labels:
+        app: data-sync-service
+    spec:
+      containers:
+      - name: sync-service
+        image: insurance-ai-bridge/data-sync:latest
+        ports:
+        - containerPort: 8080
+          name: http
+        env:
+        - name: CLOUD_DB_ENDPOINT
+          valueFrom:
+            secretKeyRef:
+              name: cloud-db-credentials
+              key: endpoint
+        - name: ONPREM_DB_ENDPOINT
+          valueFrom:
+            secretKeyRef:
+              name: onprem-db-credentials
+              key: endpoint
+        - name: SYNC_DIRECTION
+          value: "bidirectional"  # cloud_to_onprem, onprem_to_cloud, bidirectional
+        - name: SYNC_INTERVAL_SECONDS
+          value: "60"
+        - name: CDC_ENABLED
+          value: "true"
+        - name: CONFLICT_RESOLUTION_STRATEGY
+          value: "last_write_wins"  # last_write_wins, first_write_wins, manual_review, merge
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          value: "kafka.insurance-ai-bridge.svc.cluster.local:9092"
+        - name: KAFKA_TOPIC_CDC
+          value: "data-change-events"
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "1Gi"
+          limits:
+            cpu: "2000m"
+            memory: "4Gi"
+        volumeMounts:
+        - name: sync-config
+          mountPath: /app/config
+        - name: sync-state
+          mountPath: /app/state
+      volumes:
+      - name: sync-config
+        configMap:
+          name: data-sync-config
+      - name: sync-state
+        persistentVolumeClaim:
+          claimName: data-sync-state-pvc
+
+---
+# Data Sync ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: data-sync-config
+  namespace: insurance-ai-bridge
+data:
+  sync-config.yaml: |
+    # Data Synchronization Configuration
+    sync:
+      # Change Data Capture (CDC) Configuration
+      cdc:
+        enabled: true
+        provider: debezium
+        connectors:
+          - name: postgres-cloud-connector
+            type: postgres
+            host: ${CLOUD_DB_ENDPOINT}
+            port: 5432
+            database: insurance_ai_bridge
+            slot_name: cloud_replication_slot
+            publication_name: cloud_publication
+            tables:
+              - claims
+              - members
+              - policies
+              - audit_logs
+            include_schema_changes: true
+            
+          - name: postgres-onprem-connector
+            type: postgres
+            host: ${ONPREM_DB_ENDPOINT}
+            port: 5432
+            database: insurance_ai_bridge
+            slot_name: onprem_replication_slot
+            publication_name: onprem_publication
+            tables:
+              - claims
+              - members
+              - policies
+              - audit_logs
+            include_schema_changes: true
+      
+      # Batch Synchronization Configuration
+      batch:
+        enabled: true
+        schedule: "0 */6 * * *"  # Every 6 hours
+        batch_size: 1000
+        tables:
+          - name: claims
+            filter: "created_at > NOW() - INTERVAL '24 hours'"
+          - name: members
+            filter: "updated_at > NOW() - INTERVAL '24 hours'"
+      
+      # Conflict Resolution
+      conflict_resolution:
+        default_strategy: last_write_wins
+        strategies:
+          - table: claims
+            strategy: last_write_wins
+            compare_fields:
+              - updated_at
+              - version
+          
+          - table: members
+            strategy: merge
+            merge_rules:
+              - field: contact_info
+                strategy: merge_objects
+          
+          - table: audit_logs
+            strategy: append
+            never_conflict: true
+      
+      # Replication Filters
+      filters:
+        # Only sync data based on tier
+        tier_filter:
+          enabled: true
+          hot_tier:
+            sync_to: cloud
+            regions: [us-east-1, us-west-2, eu-west-1]
+          warm_tier:
+            sync_to: both
+            replication: true
+          cold_tier:
+            sync_to: onprem
+          metadata_tier:
+            sync_to: both
+            replication: true
+        
+        # PII Filtering
+        pii_filter:
+          enabled: true
+          encrypt_pii: true
+          fields:
+            - ssn
+            - credit_card
+            - email
+            - phone
+          encryption_key_source: vault
+      
+      # Performance Tuning
+      performance:
+        max_concurrent_syncs: 10
+        batch_size: 1000
+        commit_interval_ms: 5000
+        max_lag_ms: 30000
+        retry_attempts: 3
+        retry_backoff_ms: 1000
+
+---
+# Data Sync Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: data-sync-service
+  namespace: insurance-ai-bridge
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8080
+    targetPort: 8080
+    protocol: TCP
+    name: http
+  selector:
+    app: data-sync-service
+
+---
+# Persistent Volume Claim for Sync State
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: data-sync-state-pvc
+  namespace: insurance-ai-bridge
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: fast-ssd
+  resources:
+    requests:
+      storage: 50Gi
+
