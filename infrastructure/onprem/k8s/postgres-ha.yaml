@@ -1,0 +1,355 @@
+# High-Availability PostgreSQL Cluster for On-Premise
+# Using Patroni for high availability
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: patroni-config
+  namespace: insurance-ai-bridge-onprem
+data:
+  patroni.yml: |
+    scope: insurance-ai-bridge-onprem
+    namespace: /insurance-ai-bridge-onprem/
+    name: postgres-onprem-primary
+    
+    restapi:
+      listen: 0.0.0.0:8008
+      connect_address: ${PATRONI_KUBERNETES_NAME}.${PATRONI_KUBERNETES_NAMESPACE}.svc.cluster.local:8008
+      authentication:
+        username: patroni
+        password: ${PATRONI_RESTAPI_PASSWORD}
+    
+    bootstrap:
+      dcs:
+        ttl: 30
+        loop_wait: 10
+        retry_timeout: 30
+        maximum_lag_on_failover: 1048576
+        postgresql:
+          use_pg_rewind: true
+          use_slots: true
+          parameters:
+            wal_level: logical
+            hot_standby: "on"
+            wal_keep_segments: 64
+            max_connections: 200
+            max_worker_processes: 8
+            max_wal_senders: 10
+            wal_log_hints: "on"
+            max_replication_slots: 10
+            track_commit_timestamp: "on"
+            synchronous_commit: "remote_write"
+            synchronous_standby_names: "ANY 2 (postgres-onprem-replica-1,postgres-onprem-replica-2)"
+      initdb:
+      - encoding: UTF8
+      - locale: en_US.UTF-8
+      - data-checksums
+      pg_hba:
+      - host replication replicator 0.0.0.0/0 md5
+      - host all all 0.0.0.0/0 md5
+    
+    postgresql:
+      listen: 0.0.0.0:5432
+      connect_address: ${PATRONI_KUBERNETES_NAME}.${PATRONI_KUBERNETES_NAMESPACE}.svc.cluster.local:5432
+      data_dir: /var/lib/postgresql/data
+      pgpass: /tmp/pgpass
+      authentication:
+        replication:
+          username: replicator
+          password: ${POSTGRES_REPLICATION_PASSWORD}
+        superuser:
+          username: postgres
+          password: ${POSTGRES_SUPERUSER_PASSWORD}
+      parameters:
+        unix_socket_directories: '/var/run/postgresql'
+        shared_buffers: 4GB
+        effective_cache_size: 12GB
+        maintenance_work_mem: 1GB
+        checkpoint_completion_target: 0.9
+        wal_buffers: 16MB
+        default_statistics_target: 100
+        random_page_cost: 1.1
+        effective_io_concurrency: 200
+        work_mem: 32MB
+        min_wal_size: 1GB
+        max_wal_size: 4GB
+        max_connections: 200
+        max_worker_processes: 8
+        max_parallel_workers_per_gather: 4
+        max_parallel_workers: 8
+        max_parallel_maintenance_workers: 4
+        ssl: "on"
+        ssl_cert_file: "/etc/postgresql/ssl/server.crt"
+        ssl_key_file: "/etc/postgresql/ssl/server.key"
+    
+    tags:
+      nofailover: false
+      noloadbalance: false
+      clonefrom: false
+      nosync: false
+
+---
+# PostgreSQL Primary StatefulSet
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres-onprem-primary
+  namespace: insurance-ai-bridge-onprem
+spec:
+  serviceName: postgres-onprem
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres-onprem
+      role: primary
+  template:
+    metadata:
+      labels:
+        app: postgres-onprem
+        role: primary
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:15-alpine
+        ports:
+        - containerPort: 5432
+          name: postgres
+        - containerPort: 8008
+          name: restapi
+        env:
+        - name: PATRONI_KUBERNETES_NAME
+          value: postgres-onprem-primary
+        - name: PATRONI_KUBERNETES_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: PATRONI_RESTAPI_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secrets
+              key: patroni-restapi-password
+        - name: POSTGRES_REPLICATION_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secrets
+              key: replication-password
+        - name: POSTGRES_SUPERUSER_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secrets
+              key: superuser-password
+        volumeMounts:
+        - name: postgres-data
+          mountPath: /var/lib/postgresql/data
+        - name: patroni-config
+          mountPath: /etc/patroni
+        - name: ssl-certs
+          mountPath: /etc/postgresql/ssl
+        resources:
+          requests:
+            cpu: "2000m"
+            memory: "8Gi"
+          limits:
+            cpu: "4000m"
+            memory: "16Gi"
+        livenessProbe:
+          httpGet:
+            path: /liveness
+            port: 8008
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /readiness
+            port: 8008
+          initialDelaySeconds: 10
+          periodSeconds: 5
+      volumes:
+      - name: patroni-config
+        configMap:
+          name: patroni-config
+      - name: ssl-certs
+        secret:
+          secretName: postgres-ssl-certs
+  volumeClaimTemplates:
+  - metadata:
+      name: postgres-data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: fast-ssd
+      resources:
+        requests:
+          storage: 500Gi
+
+---
+# PostgreSQL Read Replicas
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres-onprem-replicas
+  namespace: insurance-ai-bridge-onprem
+spec:
+  serviceName: postgres-onprem-replica
+  replicas: 2
+  selector:
+    matchLabels:
+      app: postgres-onprem
+      role: replica
+  template:
+    metadata:
+      labels:
+        app: postgres-onprem
+        role: replica
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:15-alpine
+        ports:
+        - containerPort: 5432
+          name: postgres
+        env:
+        - name: PATRONI_SCOPE
+          value: insurance-ai-bridge-onprem
+        - name: PATRONI_NAME
+          value: postgres-onprem-replica-$(POD_NAME)
+        - name: POSTGRES_REPLICATION_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secrets
+              key: replication-password
+        volumeMounts:
+        - name: postgres-data
+          mountPath: /var/lib/postgresql/data
+        resources:
+          requests:
+            cpu: "1000m"
+            memory: "4Gi"
+          limits:
+            cpu: "2000m"
+            memory: "8Gi"
+  volumeClaimTemplates:
+  - metadata:
+      name: postgres-data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: fast-ssd
+      resources:
+        requests:
+          storage: 500Gi
+
+---
+# PostgreSQL Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-onprem
+  namespace: insurance-ai-bridge-onprem
+spec:
+  type: ClusterIP
+  ports:
+  - port: 5432
+    targetPort: 5432
+    protocol: TCP
+    name: postgres
+  selector:
+    app: postgres-onprem
+
+---
+# PgBouncer Connection Pooler
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pgbouncer-onprem
+  namespace: insurance-ai-bridge-onprem
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: pgbouncer-onprem
+  template:
+    metadata:
+      labels:
+        app: pgbouncer-onprem
+    spec:
+      containers:
+      - name: pgbouncer
+        image: pgbouncer/pgbouncer:latest
+        ports:
+        - containerPort: 6432
+          name: pgbouncer
+        env:
+        - name: DATABASES_HOST
+          value: postgres-onprem.insurance-ai-bridge-onprem.svc.cluster.local
+        - name: DATABASES_PORT
+          value: "5432"
+        - name: DATABASES_DBNAME
+          value: insurance_ai_bridge
+        - name: DATABASES_USER
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secrets
+              key: pooler-user
+        - name: DATABASES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secrets
+              key: pooler-password
+        - name: PGBOUNCER_LISTEN_PORT
+          value: "6432"
+        - name: PGBOUNCER_POOL_MODE
+          value: "transaction"
+        - name: PGBOUNCER_MAX_CLIENT_CONN
+          value: "10000"
+        - name: PGBOUNCER_DEFAULT_POOL_SIZE
+          value: "100"
+        - name: PGBOUNCER_MIN_POOL_SIZE
+          value: "20"
+        - name: PGBOUNCER_RESERVE_POOL_SIZE
+          value: "10"
+        - name: PGBOUNCER_MAX_DB_CONNECTIONS
+          value: "1000"
+        volumeMounts:
+        - name: pgbouncer-config
+          mountPath: /etc/pgbouncer
+        resources:
+          requests:
+            cpu: "200m"
+            memory: "256Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+        livenessProbe:
+          tcpSocket:
+            port: 6432
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - psql -h localhost -p 6432 -U pgbouncer -d pgbouncer -c "SHOW POOLS;" > /dev/null
+          initialDelaySeconds: 10
+          periodSeconds: 5
+      volumes:
+      - name: pgbouncer-config
+        configMap:
+          name: pgbouncer-config
+
+---
+# PgBouncer Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: pgbouncer-onprem
+  namespace: insurance-ai-bridge-onprem
+spec:
+  type: ClusterIP
+  ports:
+  - port: 6432
+    targetPort: 6432
+    protocol: TCP
+    name: pgbouncer
+  selector:
+    app: pgbouncer-onprem
+

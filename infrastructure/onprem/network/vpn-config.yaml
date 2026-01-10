@@ -1,0 +1,202 @@
+# VPN Configuration for Hybrid Cloud Connectivity
+# Supports Site-to-Site VPN, AWS Direct Connect, Azure ExpressRoute
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vpn-config
+  namespace: insurance-ai-bridge-onprem
+data:
+  # Site-to-Site VPN Configuration
+  site-to-site-vpn.conf: |
+    # IPSec Configuration
+    type: site-to-site
+    protocol: IPSec
+    encryption: aes-256
+    hash: sha256
+    dh-group: 14
+    lifetime: 28800
+    pfs: yes
+    
+    # AWS VPN Gateway Configuration
+    aws-vpn-gateway-id: vgw-xxxxxxxxxxxxxxxxx
+    aws-customer-gateway-id: cgw-xxxxxxxxxxxxxxxxx
+    aws-vpn-connection-id: vpn-xxxxxxxxxxxxxxxxx
+    
+    # Azure VPN Gateway Configuration
+    azure-vpn-gateway-name: vpn-gateway-insurance-ai-bridge
+    azure-vpn-gateway-resource-group: rg-vpn-onprem
+    azure-local-network-gateway: lgw-onprem-datacenter
+    
+    # GCP VPN Tunnel Configuration
+    gcp-vpn-tunnel-name: vpn-tunnel-onprem-to-cloud
+    gcp-vpn-gateway: vpn-gw-insurance-ai-bridge
+    gcp-peer-ip: 35.x.x.x
+    
+    # Network Configuration
+    local-network: 10.100.0.0/16
+    remote-network-cloud: 10.0.0.0/8
+    remote-network-onprem: 10.100.0.0/16
+    
+    # Routing
+    static-routes:
+      - destination: 10.0.0.0/8
+        gateway: cloud-vpn-gateway
+        metric: 100
+      - destination: 10.100.0.0/16
+        gateway: onprem-gateway
+        metric: 100
+  
+  # Direct Connect / ExpressRoute Configuration
+  dedicated-connection.conf: |
+    # AWS Direct Connect Configuration
+    aws-direct-connect:
+      connection-id: dxcon-xxxxxxxxxxxxx
+      connection-name: DirectConnect-OnPrem-To-AWS
+      bandwidth: 10Gbps
+      location: Equinix-DC1
+      virtual-interfaces:
+        - vif-id: dxvif-xxxxxxxxxxxxx
+          vlan: 100
+          address-family: ipv4
+          bgp-peer-ip: 169.254.0.1/30
+          bgp-asn: 65000
+          routes:
+            - 10.0.0.0/8
+            - 10.100.0.0/16
+    
+    # Azure ExpressRoute Configuration
+    azure-expressroute:
+      circuit-name: ExpressRoute-OnPrem-To-Azure
+      service-provider: Equinix
+      peering-location: Washington DC
+      bandwidth: 10Gbps
+      sku: Premium
+      peering-types:
+        - AzurePrivatePeering
+        - MicrosoftPeering
+      private-peering:
+        primary-peer-address: 192.168.1.1/30
+        secondary-peer-address: 192.168.1.5/30
+        vlan-id: 100
+        asn: 65000
+        shared-key: <shared-key>
+      microsoft-peering:
+        primary-peer-address: 192.168.2.1/30
+        secondary-peer-address: 192.168.2.5/30
+        vlan-id: 200
+        asn: 65000
+        advertised-public-prefixes:
+          - 203.0.113.0/24
+    
+    # GCP Interconnect Configuration
+    gcp-interconnect:
+      name: interconnect-onprem-to-gcp
+      location: us-east4
+      interconnect-type: DEDICATED
+      link-type: LINK_TYPE_ETHERNET_10G_LR
+      requested-link-count: 2
+      admin-enabled: true
+      interconnect-attachments:
+        - name: attachment-us-east4
+          router: router-onprem
+          region: us-east4
+          vlan-tag: 100
+          bandwidth: BPS_10G
+
+  # Network Segmentation Configuration
+  network-segmentation.yaml: |
+    segments:
+      - name: dmz
+        cidr: 10.100.10.0/24
+        purpose: "Demilitarized zone for cloud connectivity"
+        allowed_egress:
+          - cloud-api-endpoints
+          - external-apis
+        allowed_ingress:
+          - cloud-vpn
+          - direct-connect
+        
+      - name: application
+        cidr: 10.100.20.0/24
+        purpose: "Application tier"
+        allowed_egress:
+          - database-tier
+          - cache-tier
+          - legacy-systems
+        allowed_ingress:
+          - dmz
+          - internal-load-balancers
+        
+      - name: database
+        cidr: 10.100.30.0/24
+        purpose: "Database tier - isolated"
+        allowed_egress:
+          - backup-storage
+          - monitoring
+        allowed_ingress:
+          - application-tier
+          - backup-servers
+        
+      - name: legacy-integration
+        cidr: 10.100.40.0/24
+        purpose: "Legacy system integration"
+        allowed_egress:
+          - legacy-sql-server
+          - legacy-applications
+        allowed_ingress:
+          - application-tier
+          - sync-services
+
+---
+# VPN Gateway Deployment (if using software VPN)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vpn-gateway
+  namespace: insurance-ai-bridge-onprem
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: vpn-gateway
+  template:
+    metadata:
+      labels:
+        app: vpn-gateway
+    spec:
+      containers:
+      - name: strongswan
+        image: strongswan/strongswan:latest
+        ports:
+        - containerPort: 500
+          name: isakmp
+          protocol: UDP
+        - containerPort: 4500
+          name: ipsec-nat-t
+          protocol: UDP
+        env:
+        - name: VPN_TYPE
+          value: "site-to-site"
+        volumeMounts:
+        - name: vpn-config
+          mountPath: /etc/ipsec.conf
+        - name: vpn-secrets
+          mountPath: /etc/ipsec.secrets
+        resources:
+          requests:
+            cpu: "200m"
+            memory: "256Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+      volumes:
+      - name: vpn-config
+        configMap:
+          name: vpn-config
+      - name: vpn-secrets
+        secret:
+          secretName: vpn-secrets
+      nodeSelector:
+        node-type: network-gateway
+

@@ -1,0 +1,10 @@
+# On-Premise Kubernetes Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: insurance-ai-bridge-onprem
+  labels:
+    environment: onprem
+    tier: private
+    compliance: required
+
