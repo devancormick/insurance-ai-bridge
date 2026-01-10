@@ -1,9 +1,13 @@
 """Members API endpoints."""
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Depends
 from typing import List, Optional
 from app.core.cache import cache
 from app.core.exceptions import MemberNotFoundError
 from app.core.data_aggregator import DataAggregator
+from app.api.deps import get_db
+from app.models.claim import Claim
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 from app.utils.logging import logger
 
 router = APIRouter()
@@ -58,7 +62,8 @@ async def get_member(member_id: str) -> dict:
 async def get_member_claims(
     member_id: str,
     limit: Optional[int] = 50,
-    offset: Optional[int] = 0
+    offset: Optional[int] = 0,
+    db: AsyncSession = Depends(get_db)
 ) -> dict:
     """
     Get claim history for a member.

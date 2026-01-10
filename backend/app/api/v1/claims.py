@@ -1,11 +1,15 @@
 """Claims API endpoints."""
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Depends
 from typing import Dict, Any, List, Optional
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select, and_
 from app.schemas.claim_analysis import ClaimAnalysisRequest, ClaimAnalysisResponse
 from app.core.pii_handler import PIIHandler
 from app.core.data_aggregator import DataAggregator
 from app.core.llm_orchestrator import LLMOrchestrator
 from app.core.cache import cache
+from app.api.deps import get_db
+from app.models.claim import Claim
 from app.utils.logging import logger
 import time
 
@@ -17,7 +21,8 @@ async def list_claims(
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=100),
     status: Optional[str] = Query(None, description="Filter by claim status"),
-    member_id: Optional[str] = Query(None, description="Filter by member ID")
+    member_id: Optional[str] = Query(None, description="Filter by member ID"),
+    db: AsyncSession = Depends(get_db)
 ) -> List[dict]:
     """
     List claims with optional filtering.
