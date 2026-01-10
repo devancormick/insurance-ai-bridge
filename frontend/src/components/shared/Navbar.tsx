@@ -31,6 +31,13 @@ export function Navbar() {
                 <Button
                   variant="ghost"
                   size="sm"
+                  onClick={() => router.push('/claims')}
+                >
+                  Claims
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={() => router.push('/dashboard')}
                 >
                   Dashboard
