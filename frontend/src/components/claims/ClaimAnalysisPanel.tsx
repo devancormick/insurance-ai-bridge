@@ -1,5 +1,7 @@
 import React from 'react';
 import { useClaimAnalysis } from '@/hooks/useClaimData';
+import { PolicyReferences } from './PolicyReferences';
+import { ReasoningTrace } from './ReasoningTrace';
 
 interface ClaimAnalysisPanelProps {
   claimId: string;
@@ -56,7 +58,24 @@ export function ClaimAnalysisPanel({ claimId }: ClaimAnalysisPanelProps) {
         <DenialReasonCard reason={analysis.denial_reason} />
       )}
       
-      <div className="text-sm text-gray-500">
+      <PolicyReferences sections={analysis.policy_sections} />
+      
+      <ReasoningTrace steps={analysis.reasoning_steps} />
+      
+      {analysis.potential_issues && analysis.potential_issues.length > 0 && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <h3 className="text-lg font-semibold text-yellow-800 mb-2">
+            Potential Issues
+          </h3>
+          <ul className="list-disc list-inside space-y-1 text-sm text-yellow-700">
+            {analysis.potential_issues.map((issue, idx) => (
+              <li key={idx}>{issue}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+      
+      <div className="text-sm text-gray-500 border-t pt-4">
         <p>Analysis completed at {new Date(analysis.analysis_timestamp).toLocaleString()}</p>
         <p>Processing time: {data.processing_time_ms}ms</p>
         <p>Tokens used: {analysis.tokens_used}</p>

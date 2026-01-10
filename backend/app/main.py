@@ -64,14 +64,19 @@ async def rate_limit(request: Request, call_next):
         request, call_next, max_requests=max_requests, window_seconds=window_seconds
     )
 
-# Request logging middleware
+# Request logging middleware (includes audit logging)
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
-    """Log all requests with timing and metrics."""
+    """Log all requests with timing, metrics, and audit trail."""
     from app.core.monitoring import increment_counter, record_gauge, metrics
+    from app.middleware.audit import audit_log_middleware
     
+    # Combine audit and metrics logging
     start_time = time.time()
-    response = await call_next(request)
+    
+    # Audit logging
+    response = await audit_log_middleware(request, call_next)
+    
     process_time = time.time() - start_time
     
     # Update metrics

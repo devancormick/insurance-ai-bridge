@@ -1,6 +1,6 @@
 """API v1 router."""
 from fastapi import APIRouter
-from app.api.v1 import claims, auth, policies, members
+from app.api.v1 import claims, auth, policies, members, metrics
 
 api_router = APIRouter()
 
@@ -9,4 +9,5 @@ api_router.include_router(auth.router, prefix="/auth", tags=["authentication"])
 api_router.include_router(claims.router, prefix="/claims", tags=["claims"])
 api_router.include_router(policies.router, prefix="/policies", tags=["policies"])
 api_router.include_router(members.router, prefix="/members", tags=["members"])
+api_router.include_router(metrics.router, prefix="/metrics", tags=["monitoring"])
 
