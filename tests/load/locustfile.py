@@ -98,3 +98,4 @@ class HighLoadScenario(HttpUser):
 # Run with:
 # locust -f locustfile.py --host=https://api.insurance-ai-bridge.com --users 10000 --spawn-rate 100
 
+
