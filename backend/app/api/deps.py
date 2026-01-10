@@ -68,16 +68,35 @@ async def get_current_user_optional(token: Optional[str] = Depends(oauth2_scheme
         if username is None:
             return None
         
-        # TODO: Load from database instead of mock
-        from app.api.v1.auth import get_user
-        user = get_user(username)
-        return user
+        # Load from database
+        from app.models.user import User
+        from sqlalchemy import select
+        
+        result = await session.execute(
+            select(User).where(User.username == username)
+        )
+        user_orm = result.scalar_one_or_none()
+        
+        if user_orm:
+            return {
+                "id": user_orm.id,
+                "username": user_orm.username,
+                "email": user_orm.email,
+                "full_name": user_orm.full_name,
+                "disabled": user_orm.disabled,
+                "is_superuser": user_orm.is_superuser
+            }
+        
+        return None
         
     except JWTError:
         return None
 
 
-async def get_current_user_required(token: str = Depends(oauth2_scheme)) -> dict:
+async def get_current_user_required(
+    token: str = Depends(oauth2_scheme),
+    db: AsyncSession = Depends(get_db)
+) -> dict:
     """
     Get current user (required authentication).
     
@@ -91,16 +110,29 @@ async def get_current_user_required(token: str = Depends(oauth2_scheme)) -> dict
         if username is None:
             raise AuthenticationError("Could not validate credentials")
         
-        # TODO: Load from database instead of mock
-        from app.api.v1.auth import get_user
-        user = get_user(username)
-        if user is None:
+        # Load from database
+        from app.models.user import User
+        from sqlalchemy import select
+        
+        result = await db.execute(
+            select(User).where(User.username == username)
+        )
+        user_orm = result.scalar_one_or_none()
+        
+        if user_orm is None:
             raise AuthenticationError("User not found")
         
-        if user.get("disabled", False):
+        if user_orm.disabled:
             raise AuthorizationError("User account is disabled")
         
-        return user
+        return {
+            "id": user_orm.id,
+            "username": user_orm.username,
+            "email": user_orm.email,
+            "full_name": user_orm.full_name,
+            "disabled": user_orm.disabled,
+            "is_superuser": user_orm.is_superuser
+        }
         
     except JWTError as e:
         logger.warning(f"JWT validation failed: {e}")
