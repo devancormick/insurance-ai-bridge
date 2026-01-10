@@ -1,0 +1,9 @@
+# Kubernetes Namespace Configuration
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: insurance-ai-bridge
+  labels:
+    name: insurance-ai-bridge
+    environment: production
+
