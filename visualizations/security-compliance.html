@@ -44,6 +44,38 @@
             background: linear-gradient(135deg, rgba(63, 185, 80, 0.1), rgba(88, 166, 255, 0.1));
             border-radius: 20px;
             border: 1px solid var(--border);
+            position: relative;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: var(--dark-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .back-button:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #0a0e1a;
+            transform: translateX(-3px);
+        }
+
+        .back-button::before {
+            content: '←';
+            font-size: 18px;
         }
 
         h1 {
@@ -265,6 +297,7 @@
 <body>
     <div class="container">
         <header>
+            <a href="../index.html" class="back-button">Back to Home</a>
             <h1>🔒 Security & HIPAA Compliance</h1>
             <div class="subtitle">Zero-retention PII policy • End-to-end encryption • Full audit logging</div>
         </header>

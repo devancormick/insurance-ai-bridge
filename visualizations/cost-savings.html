@@ -40,6 +40,42 @@
         header {
             text-align: center;
             margin-bottom: 60px;
+            position: relative;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            z-index: 10;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .back-button:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+            transform: translateX(-3px);
+        }
+
+        .back-button::before {
+            content: '←';
+            font-size: 18px;
+        }
+
+        header {
             padding: 50px 20px;
             background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(59, 130, 246, 0.1));
             border-radius: 20px;
@@ -264,6 +300,7 @@
 <body>
     <div class="container">
         <header>
+            <a href="../index.html" class="back-button">Back to Home</a>
             <h1>💰 Cost Savings Analysis</h1>
             <div class="subtitle">Measurable ROI from AI-powered claim processing automation</div>
         </header>

@@ -45,6 +45,38 @@
             padding: 40px;
             margin-bottom: 30px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .back-button:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+            transform: translateX(-3px);
+        }
+
+        .back-button::before {
+            content: '←';
+            font-size: 18px;
         }
 
         h1 {
@@ -450,6 +482,7 @@
 <body>
     <div class="container">
         <header>
+            <a href="../index.html" class="back-button">Back to Home</a>
             <h1>Claim Analysis Viewer</h1>
             <div class="subtitle">Watch the AI Bridge system analyze an insurance claim in real-time</div>
         </header>

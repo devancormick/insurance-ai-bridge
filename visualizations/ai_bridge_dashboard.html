@@ -31,6 +31,35 @@
             border-radius: 12px;
             margin-bottom: 30px;
             border: 1px solid #334155;
+            position: relative;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid #334155;
+            border-radius: 6px;
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: #3b82f6;
+            color: #e2e8f0;
+            transform: translateX(-3px);
+        }
+
+        .back-button::before {
+            content: '←';
+            font-size: 16px;
         }
 
         .header h1 {
@@ -411,6 +440,7 @@
     <div class="container">
         <!-- Header -->
         <div class="header">
+            <a href="../index.html" class="back-button">Back to Home</a>
             <h1>AI Bridge System Dashboard</h1>
             <p>Real-time visualization of claim processing workflow • Built with FastAPI + Next.js</p>
         </div>

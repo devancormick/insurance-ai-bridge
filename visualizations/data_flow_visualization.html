@@ -28,6 +28,38 @@
         .header {
             text-align: center;
             margin-bottom: 60px;
+            position: relative;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            color: #e2e8f0;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .back-button:hover {
+            background: #3b82f6;
+            border-color: #3b82f6;
+            color: white;
+            transform: translateX(-3px);
+        }
+
+        .back-button::before {
+            content: '←';
+            font-size: 18px;
         }
 
         .header h1 {
@@ -442,6 +474,7 @@
     <div class="container">
         <!-- Header -->
         <div class="header">
+            <a href="../index.html" class="back-button">Back to Home</a>
             <h1>Data Transformation Pipeline</h1>
             <p>Watch how unstructured claim notes transform into actionable structured data</p>
         </div>
