@@ -10,9 +10,10 @@ echo "📦 Verifying Git repository..."
 if [ ! -d ".git" ]; then
     echo "Initializing Git repository..."
     git init
-    git config user.name "devancormick"
-    git config user.email "devancormick@users.noreply.github.com"
     git branch -M main
+    echo "⚠️  Please configure Git user name and email:"
+    echo "   git config user.name \"Your Name\""
+    echo "   git config user.email \"your.email@example.com\""
 fi
 
 # 2. Check Python version

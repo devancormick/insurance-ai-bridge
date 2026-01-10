@@ -54,8 +54,7 @@ def custom_openapi_schema() -> Dict[str, Any]:
     
     # Add custom documentation
     openapi_schema["info"]["contact"] = {
-        "name": "Insurance AI Bridge Support",
-        "email": "devancormick@users.noreply.github.com"
+        "name": "Insurance AI Bridge Support"
     }
     
     openapi_schema["info"]["license"] = {
