@@ -1,10 +1,11 @@
 """API v1 router."""
 from fastapi import APIRouter
-from app.api.v1 import claims
+from app.api.v1 import claims, auth
 
 api_router = APIRouter()
 
 # Include route modules
+api_router.include_router(auth.router, prefix="/auth", tags=["authentication"])
 api_router.include_router(claims.router, prefix="/claims", tags=["claims"])
 
 # TODO: Add other routers when implemented
