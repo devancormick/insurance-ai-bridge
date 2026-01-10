@@ -51,7 +51,10 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
             await session.close()
 
 
-async def get_current_user_optional(token: Optional[str] = Depends(oauth2_scheme)) -> Optional[dict]:
+async def get_current_user_optional(
+    token: Optional[str] = Depends(oauth2_scheme),
+    db: AsyncSession = Depends(get_db)
+) -> Optional[dict]:
     """
     Get current user (optional authentication).
     
