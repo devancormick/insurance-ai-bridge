@@ -35,21 +35,32 @@ class UserCreate(BaseModel):
 
 # TODO: Replace with actual database user model
 # This is a placeholder for demonstration
-MOCK_USERS = {
-    "admin": {
-        "username": "admin",
-        "email": "admin@example.com",
-        "hashed_password": get_password_hash("admin123"),  # In production, use secure default
-        "full_name": "Administrator",
-        "disabled": False,
-    }
-}
+# Lazy initialization to avoid bcrypt hashing during module import
+MOCK_USERS = None
+
+def get_mock_users():
+    """Get or initialize mock users."""
+    global MOCK_USERS
+    if MOCK_USERS is None:
+        MOCK_USERS = {
+            "admin": {
+                "username": "admin",
+                "email": "admin@example.com",
+                # Password: admin123 (hashed with bcrypt)
+                # In production, load from database
+                "hashed_password": "$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5LS2qNKcN6YWO",  # admin123
+                "full_name": "Administrator",
+                "disabled": False,
+            }
+        }
+    return MOCK_USERS
 
 
 def get_user(username: str):
     """Get user by username (placeholder - replace with DB query)."""
-    if username in MOCK_USERS:
-        return MOCK_USERS[username]
+    users = get_mock_users()
+    if username in users:
+        return users[username]
     return None
 
 
