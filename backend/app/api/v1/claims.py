@@ -36,16 +36,45 @@ async def list_claims(
     Returns:
         List of claim dictionaries
     """
-    # TODO: Implement actual database query
-    # For now, return empty list
-    # In production, query from database with filters
+    # Check cache first
     cache_key = f"claims:list:skip:{skip}:limit:{limit}:status:{status}:member:{member_id}"
     cached = await cache.get(cache_key)
     if cached:
         return cached
     
-    # Placeholder for actual implementation
-    claims = []
+    # Query from database
+    query = select(Claim)
+    
+    # Apply filters
+    filters = []
+    if status:
+        filters.append(Claim.status == status)
+    if member_id:
+        filters.append(Claim.member_id == member_id)
+    
+    if filters:
+        query = query.where(and_(*filters))
+    
+    # Apply pagination
+    query = query.offset(skip).limit(limit).order_by(Claim.created_at.desc())
+    
+    result = await db.execute(query)
+    claims_orm = result.scalars().all()
+    
+    # Convert to dictionaries
+    claims = [
+        {
+            "id": claim.id,
+            "claim_number": claim.claim_number,
+            "member_id": claim.member_id,
+            "policy_id": claim.policy_id,
+            "claim_amount": float(claim.claim_amount) if claim.claim_amount else 0.0,
+            "claim_date": claim.claim_date.isoformat() if claim.claim_date else None,
+            "status": claim.status,
+            "created_at": claim.created_at.isoformat() if claim.created_at else None,
+        }
+        for claim in claims_orm
+    ]
     
     # Cache for 2 minutes
     await cache.set(cache_key, claims, ttl=120)

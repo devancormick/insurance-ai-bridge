@@ -82,30 +82,36 @@ async def get_member_claims(
     if cached:
         return cached
     
-    data_aggregator = DataAggregator()
+    # Query member claims from database
+    query = select(Claim).where(
+        Claim.member_id == member_id
+    ).order_by(Claim.created_at.desc()).offset(offset).limit(limit)
     
-    try:
-        # TODO: Implement actual query for member claims
-        # For now, return empty list
-        claims = []
-        
-        result = {
-            "member_id": member_id,
-            "claims": claims,
-            "total": len(claims),
-            "limit": limit,
-            "offset": offset
+    result = await db.execute(query)
+    claims_orm = result.scalars().all()
+    
+    claims = [
+        {
+            "id": claim.id,
+            "claim_number": claim.claim_number,
+            "policy_id": claim.policy_id,
+            "claim_amount": float(claim.claim_amount) if claim.claim_amount else 0.0,
+            "claim_date": claim.claim_date.isoformat() if claim.claim_date else None,
+            "status": claim.status,
         }
-        
-        # Cache for 5 minutes
-        await cache.set(cache_key, result, ttl=300)
-        
-        return result
-        
-    except Exception as e:
-        logger.error(f"Error fetching member claims for {member_id}: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error fetching member claims: {str(e)}"
-        )
+        for claim in claims_orm
+    ]
+    
+    result_data = {
+        "member_id": member_id,
+        "claims": claims,
+        "total": len(claims),
+        "limit": limit,
+        "offset": offset
+    }
+    
+    # Cache for 5 minutes
+    await cache.set(cache_key, result_data, ttl=300)
+    
+    return result_data
 
