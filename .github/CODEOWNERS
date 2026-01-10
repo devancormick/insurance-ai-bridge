@@ -1,0 +1,105 @@
+# CODEOWNERS File
+# This file defines ownership of files and directories in the repository.
+# Code owners are automatically requested for review when files they own are changed.
+#
+# Format: <file-pattern> @username @team
+# Pattern matching uses gitignore-style patterns.
+#
+# Order matters! The last matching pattern takes precedence.
+
+# Global owners (review all PRs)
+* @YOUR_USERNAME
+
+# Backend code ownership
+/backend/ @YOUR_USERNAME @backend-team
+/backend/app/ @YOUR_USERNAME @backend-team
+/backend/app/api/ @YOUR_USERNAME @api-team
+/backend/app/core/ @YOUR_USERNAME @backend-team
+/backend/app/models/ @YOUR_USERNAME @backend-team
+/backend/app/schemas/ @YOUR_USERNAME @backend-team
+/backend/tests/ @YOUR_USERNAME @backend-team @qa-team
+
+# Frontend code ownership
+/frontend/ @YOUR_USERNAME @frontend-team
+/frontend/src/ @YOUR_USERNAME @frontend-team
+/frontend/src/app/ @YOUR_USERNAME @frontend-team
+/frontend/src/components/ @YOUR_USERNAME @frontend-team
+/frontend/src/lib/ @YOUR_USERNAME @frontend-team
+/frontend/e2e/ @YOUR_USERNAME @frontend-team @qa-team
+
+# Infrastructure and deployment
+/docker-compose.yml @YOUR_USERNAME @devops-team
+/docker-compose.prod.yml @YOUR_USERNAME @devops-team
+/nginx/ @YOUR_USERNAME @devops-team
+/k8s/ @YOUR_USERNAME @devops-team
+/helm/ @YOUR_USERNAME @devops-team
+
+# CI/CD
+/.github/workflows/ @YOUR_USERNAME @devops-team
+/.github/workflows/ci.yml @YOUR_USERNAME @devops-team @backend-team @frontend-team
+
+# Configuration files
+/.env.example @YOUR_USERNAME @devops-team
+/backend/alembic.ini @YOUR_USERNAME @backend-team
+/backend/pytest.ini @YOUR_USERNAME @backend-team
+/backend/requirements*.txt @YOUR_USERNAME @backend-team
+/frontend/package.json @YOUR_USERNAME @frontend-team
+/frontend/package-lock.json @YOUR_USERNAME @frontend-team
+/tsconfig.json @YOUR_USERNAME @frontend-team
+/pyproject.toml @YOUR_USERNAME @backend-team
+
+# Documentation
+/docs/ @YOUR_USERNAME @docs-team
+/README.md @YOUR_USERNAME
+/CONTRIBUTING.md @YOUR_USERNAME @docs-team
+/docs/git-workflow.md @YOUR_USERNAME @docs-team
+/docs/api-reference.md @YOUR_USERNAME @api-team @docs-team
+/docs/architecture.md @YOUR_USERNAME @docs-team
+/docs/security.md @YOUR_USERNAME @security-team @docs-team
+/docs/deployment.md @YOUR_USERNAME @devops-team @docs-team
+
+# Scripts
+/scripts/ @YOUR_USERNAME @devops-team
+/scripts/setup*.sh @YOUR_USERNAME @devops-team
+/scripts/deploy.sh @YOUR_USERNAME @devops-team
+/scripts/create_feature_branch.sh @YOUR_USERNAME @devops-team
+/scripts/sync_branch.sh @YOUR_USERNAME @devops-team
+/scripts/prepare_pr.sh @YOUR_USERNAME @devops-team
+
+# Security-related files
+/.github/CODEOWNERS @YOUR_USERNAME @security-team
+/.github/BRANCH_PROTECTION_SETUP.md @YOUR_USERNAME @devops-team @security-team
+/backend/app/core/security.py @YOUR_USERNAME @security-team @backend-team
+/backend/app/core/pii_handler.py @YOUR_USERNAME @security-team @backend-team
+
+# Git hooks
+/.githooks/ @YOUR_USERNAME @devops-team
+/scripts/setup_git_hooks.sh @YOUR_USERNAME @devops-team
+
+# Database migrations
+/backend/alembic/versions/ @YOUR_USERNAME @backend-team @dba-team
+
+# Test files
+**/*test*.py @YOUR_USERNAME @backend-team @qa-team
+**/*.spec.ts @YOUR_USERNAME @frontend-team @qa-team
+**/*.spec.tsx @YOUR_USERNAME @frontend-team @qa-team
+/playwright.config.ts @YOUR_USERNAME @frontend-team @qa-team
+
+# Note: Replace @YOUR_USERNAME with actual GitHub usernames or teams
+# Example:
+# /backend/ @john-doe @backend-developers
+# /frontend/ @jane-smith @frontend-developers
+
+# Teams can be defined in GitHub organization settings:
+# Settings → Teams → Create team
+#
+# Common teams:
+# - @backend-team - Backend developers
+# - @frontend-team - Frontend developers
+# - @api-team - API developers
+# - @devops-team - DevOps engineers
+# - @qa-team - QA engineers
+# - @docs-team - Technical writers
+# - @security-team - Security engineers
+# - @dba-team - Database administrators
+

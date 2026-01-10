@@ -113,7 +113,26 @@ cd frontend
 npm test
 ```
 
-See the full project guideline document for the complete daily commit schedule.
+### Git Workflow Setup
+
+We use **GitHub Flow** with feature branches, a `staging` branch for testing, and `main` for production.
+
+**Quick Start:**
+```bash
+# Setup Git workflow (creates staging branch)
+./scripts/setup_git_workflow.sh
+
+# Install Git hooks (enforces commit message format and code quality)
+./scripts/setup_git_hooks.sh
+
+# Create a feature branch
+./scripts/create_feature_branch.sh ISSUE-123 add-user-authentication
+```
+
+**For detailed workflow instructions, see:**
+- [Git Workflow Guide](docs/git-workflow.md) - Complete Git workflow documentation
+- [Contributing Guidelines](CONTRIBUTING.md) - Development workflow and best practices
+- [Branch Protection Setup](.github/BRANCH_PROTECTION_SETUP.md) - Branch protection configuration
 
 ## Security & HIPAA Compliance
 
@@ -130,6 +149,8 @@ This system is designed with HIPAA compliance in mind:
 - [API Reference](docs/api-reference.md)
 - [Security Guidelines](docs/security.md)
 - [Deployment Guide](docs/deployment.md)
+- [Git Workflow Guide](docs/git-workflow.md) - Complete Git workflow and branching strategy
+- [Contributing Guidelines](CONTRIBUTING.md) - How to contribute to the project
 
 ## License
 

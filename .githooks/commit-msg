@@ -1,0 +1,103 @@
+#!/bin/bash
+
+# Commit message hook
+# Validates commit message format
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+COMMIT_MSG_FILE=$1
+COMMIT_MSG=$(cat "$COMMIT_MSG_FILE")
+
+# Expected format: [COMPONENT] Action: Description (Closes #123)
+# Components: BACKEND, FRONTEND, API, LLM, SECURITY, TEST, DOCS, FIX, DEPLOY
+
+VALID_COMPONENTS=(
+    "BACKEND"
+    "FRONTEND"
+    "API"
+    "LLM"
+    "SECURITY"
+    "TEST"
+    "DOCS"
+    "FIX"
+    "DEPLOY"
+    "REFACTOR"
+    "CHORE"
+    "FEAT"
+    "PERF"
+)
+
+# Allow merge commits, revert commits, and fixup commits to bypass
+if [[ "$COMMIT_MSG" =~ ^(Merge|Revert|fixup!|squash!) ]]; then
+    exit 0
+fi
+
+# Check if message follows format
+if [[ ! "$COMMIT_MSG" =~ ^\[.*\]\ .+:\ .+ ]]; then
+    echo -e "${RED}❌ Invalid commit message format!${NC}"
+    echo -e "${YELLOW}Expected format: [COMPONENT] Action: Description${NC}"
+    echo -e "${YELLOW}Example: [BACKEND] Add user authentication endpoint${NC}"
+    echo ""
+    echo -e "${GREEN}Valid components:${NC}"
+    printf '%s ' "${VALID_COMPONENTS[@]}"
+    echo ""
+    echo -e "${RED}Your commit message:${NC}"
+    echo "$COMMIT_MSG"
+    echo ""
+    read -p "Use this message anyway? (y/N): " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        exit 1
+    fi
+fi
+
+# Extract component from message
+if [[ "$COMMIT_MSG" =~ ^\[([^\]]+)\] ]]; then
+    COMPONENT="${BASH_REMATCH[1]}"
+    
+    # Check if component is valid (case-insensitive)
+    VALID=false
+    for valid_comp in "${VALID_COMPONENTS[@]}"; do
+        if [[ "${COMPONENT^^}" == "$valid_comp" ]]; then
+            VALID=true
+            break
+        fi
+    done
+    
+    if [ "$VALID" = false ]; then
+        echo -e "${YELLOW}⚠️  Warning: Component '${COMPONENT}' is not in the standard list.${NC}"
+        echo -e "${GREEN}Valid components:${NC}"
+        printf '%s ' "${VALID_COMPONENTS[@]}"
+        echo ""
+        read -p "Continue anyway? (y/N): " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            exit 1
+        fi
+    fi
+fi
+
+# Check message length (first line should be <= 72 characters for git best practices)
+FIRST_LINE=$(echo "$COMMIT_MSG" | head -n1)
+if [ ${#FIRST_LINE} -gt 72 ]; then
+    echo -e "${YELLOW}⚠️  Warning: First line is longer than 72 characters (${#FIRST_LINE} chars).${NC}"
+    echo -e "${YELLOW}Git best practice: Keep first line under 72 characters.${NC}"
+    read -p "Continue anyway? (y/N): " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        exit 1
+    fi
+fi
+
+# Check for issue references (optional but recommended)
+if [[ ! "$COMMIT_MSG" =~ (Closes|Fixes|Relates to|Related to|#\d+) ]]; then
+    echo -e "${YELLOW}ℹ️  Tip: Consider adding issue reference: (Closes #123) or (Fixes #456)${NC}"
+fi
+
+echo -e "${GREEN}✓ Commit message format is valid!${NC}"
+exit 0
+

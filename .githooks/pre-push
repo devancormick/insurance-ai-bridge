@@ -1,0 +1,95 @@
+#!/bin/bash
+
+# Pre-push hook
+# This hook runs before pushing to ensure tests pass
+
+set -e
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+echo -e "${GREEN}Running pre-push checks...${NC}"
+
+# Get the remote and branch being pushed to
+REMOTE="$1"
+BRANCH=$(echo "$2" | sed 's/^refs\/heads\///')
+
+echo -e "${GREEN}Pushing to ${REMOTE}/${BRANCH}${NC}"
+
+# Check if pushing to protected branches
+PROTECTED_BRANCHES=("main" "staging")
+if [[ " ${PROTECTED_BRANCHES[@]} " =~ " ${BRANCH} " ]]; then
+    echo -e "${RED}ERROR: Direct pushes to ${BRANCH} are not allowed!${NC}"
+    echo -e "${YELLOW}Please create a pull request instead.${NC}"
+    exit 1
+fi
+
+# Ask user if they want to run tests
+echo -e "${YELLOW}Do you want to run tests before pushing? (recommended)${NC}"
+read -p "Run tests? (Y/n): " -n 1 -r
+echo
+if [[ ! $REPLY =~ ^[Nn]$ ]]; then
+    # Run backend tests if backend directory exists
+    if [ -d "backend" ]; then
+        echo -e "${GREEN}Running backend tests...${NC}"
+        cd backend
+        
+        if [ -d "venv" ] || command -v pytest &> /dev/null; then
+            if command -v pytest &> /dev/null; then
+                pytest tests/ -v --tb=short || {
+                    echo -e "${RED}Backend tests failed!${NC}"
+                    read -p "Push anyway? (y/N): " -n 1 -r
+                    echo
+                    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+                        exit 1
+                    fi
+                }
+            else
+                echo -e "${YELLOW}pytest not found. Skipping backend tests.${NC}"
+            fi
+        fi
+        
+        cd - > /dev/null
+    fi
+    
+    # Run frontend tests if frontend directory exists
+    if [ -d "frontend" ]; then
+        echo -e "${GREEN}Running frontend tests...${NC}"
+        cd frontend
+        
+        if [ -d "node_modules" ] && [ -f "package.json" ]; then
+            if grep -q '"test"' package.json; then
+                npm test -- --passWithNoTests || {
+                    echo -e "${RED}Frontend tests failed!${NC}"
+                    read -p "Push anyway? (y/N): " -n 1 -r
+                    echo
+                    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+                        exit 1
+                    fi
+                }
+            else
+                echo -e "${YELLOW}No test script found. Skipping frontend tests.${NC}"
+            fi
+        fi
+        
+        cd - > /dev/null
+    fi
+fi
+
+# Check branch naming convention
+if [[ ! "$BRANCH" =~ ^(main|staging|develop|feature|bugfix|hotfix|docs|refactor)/ ]]; then
+    echo -e "${YELLOW}Warning: Branch name '${BRANCH}' doesn't follow naming convention.${NC}"
+    echo -e "${YELLOW}Recommended format: feature/ISSUE-123-description${NC}"
+    read -p "Continue anyway? (y/N): " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        exit 1
+    fi
+fi
+
+echo -e "${GREEN}Pre-push checks passed!${NC}"
+exit 0
+
