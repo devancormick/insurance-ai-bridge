@@ -1,0 +1,62 @@
+# Site-to-Site VPN Configuration Templates
+# These templates can be used to configure VPN connections
+
+# AWS Site-to-Site VPN
+---
+# Terraform template for AWS VPN
+# File: infrastructure/hybrid/vpn/aws-vpn.tf
+# This would be in Terraform format, but shown as YAML for reference
+
+# Azure Site-to-Site VPN
+---
+# Terraform template for Azure VPN Gateway
+# File: infrastructure/hybrid/vpn/azure-vpn.tf
+
+# GCP VPN Tunnel
+---
+# Terraform template for GCP VPN
+# File: infrastructure/hybrid/vpn/gcp-vpn.tf
+
+# VPN Monitoring and Health Checks
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vpn-monitor
+  namespace: insurance-ai-bridge
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vpn-monitor
+  template:
+    metadata:
+      labels:
+        app: vpn-monitor
+    spec:
+      containers:
+      - name: monitor
+        image: network-tools:latest
+        command:
+        - /bin/sh
+        - -c
+        - |
+          while true; do
+            # Check AWS VPN
+            ping -c 3 10.0.0.1 || echo "AWS VPN down"
+            
+            # Check Azure VPN
+            ping -c 3 10.1.0.1 || echo "Azure VPN down"
+            
+            # Check GCP VPN
+            ping -c 3 10.2.0.1 || echo "GCP VPN down"
+            
+            sleep 60
+          done
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "200m"
+            memory: "256Mi"
+

@@ -1,0 +1,271 @@
+# Hybrid API Gateway Configuration
+# Routes requests between cloud and on-premise based on data tier and routing rules
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hybrid-gateway-config
+  namespace: insurance-ai-bridge
+data:
+  gateway-config.yaml: |
+    # Hybrid API Gateway Routing Configuration
+    routing:
+      # Route based on data tier
+      tier-based-routing:
+        enabled: true
+        rules:
+          - tier: hot
+            target: cloud
+            regions:
+              - us-east-1
+              - us-west-2
+              - eu-west-1
+            load-balancing: round-robin
+            
+          - tier: warm
+            target: hybrid
+            routing-strategy: closest-region
+            fallback: cloud
+            
+          - tier: cold
+            target: onprem
+            endpoint: onprem-api-gateway.insurance-ai-bridge-onprem.svc.cluster.local:8000
+            
+          - tier: metadata
+            target: both
+            replication: true
+            consistency: eventual
+    
+      # Route based on endpoint/API path
+      path-based-routing:
+        rules:
+          - path: /api/v1/claims/recent
+            target: cloud
+            cache: true
+            cache-ttl: 300
+            
+          - path: /api/v1/claims/archive
+            target: onprem
+            timeout: 30s
+            
+          - path: /api/v1/legacy/*
+            target: onprem
+            passthrough: true
+            
+          - path: /api/v1/analytics/*
+            target: cloud
+            regions:
+              - us-east-1  # Analytics in primary region
+    
+      # Route based on geographic location
+      geo-routing:
+        enabled: true
+        rules:
+          - region: us-east
+            preferred-target: cloud
+            preferred-region: us-east-1
+            fallback-regions:
+              - us-west-2
+              - onprem
+            
+          - region: us-west
+            preferred-target: cloud
+            preferred-region: us-west-2
+            fallback-regions:
+              - us-east-1
+              - onprem
+            
+          - region: eu-west
+            preferred-target: cloud
+            preferred-region: eu-west-1
+            fallback-regions:
+              - us-east-1
+              - onprem
+            
+          - region: onprem-datacenter
+            preferred-target: onprem
+            fallback: cloud
+    
+      # Route based on user/organization
+      tenant-based-routing:
+        enabled: true
+        rules:
+          - tenant: enterprise-a
+            preferred-target: onprem
+            data-residency: required
+            compliance: hipaa
+            
+          - tenant: enterprise-b
+            preferred-target: cloud
+            regions:
+              - us-east-1
+    
+    # Health checks and failover
+    health-checks:
+      enabled: true
+      interval: 10s
+      timeout: 5s
+      failure-threshold: 3
+      success-threshold: 1
+      endpoints:
+        - name: cloud-us-east-1
+          url: https://api-us-east-1.insurance-ai-bridge.com/health
+        - name: cloud-us-west-2
+          url: https://api-us-west-2.insurance-ai-bridge.com/health
+        - name: cloud-eu-west-1
+          url: https://api-eu-west-1.insurance-ai-bridge.com/health
+        - name: onprem
+          url: https://onprem-api.insurance-ai-bridge.internal/health
+    
+    # Circuit breaker configuration
+    circuit-breaker:
+      enabled: true
+      failure-threshold: 5
+      timeout: 60s
+      half-open-max-calls: 3
+      success-threshold: 2
+    
+    # Rate limiting
+    rate-limiting:
+      enabled: true
+      default-limit: 1000
+      per-endpoint-limits:
+        /api/v1/claims: 100
+        /api/v1/analytics: 50
+        /api/v1/legacy: 20
+      per-tenant-limits:
+        enterprise-a: 5000
+        enterprise-b: 2000
+    
+    # Authentication and authorization
+    auth:
+      enabled: true
+      providers:
+        - name: oauth2
+          type: oauth2
+          issuer: https://auth.insurance-ai-bridge.com
+        - name: saml
+          type: saml
+          enabled: true
+        - name: api-key
+          type: api-key
+          enabled: true
+      rbac:
+        enabled: true
+        policy-engine: opa  # Open Policy Agent
+    
+    # Observability
+    observability:
+      tracing:
+        enabled: true
+        exporter: jaeger
+        sample-rate: 1.0
+      metrics:
+        enabled: true
+        exporter: prometheus
+        port: 9090
+      logging:
+        enabled: true
+        level: info
+        format: json
+        correlation-id: true
+
+---
+# Hybrid API Gateway Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hybrid-api-gateway
+  namespace: insurance-ai-bridge
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: hybrid-api-gateway
+  template:
+    metadata:
+      labels:
+        app: hybrid-api-gateway
+    spec:
+      containers:
+      - name: gateway
+        image: envoyproxy/envoy:v1.28-latest
+        ports:
+        - containerPort: 8080
+          name: http
+        - containerPort: 8443
+          name: https
+        - containerPort: 9090
+          name: metrics
+        env:
+        - name: GATEWAY_CONFIG_PATH
+          value: /etc/gateway/gateway-config.yaml
+        - name: CLOUD_ENDPOINTS
+          value: "api-us-east-1.insurance-ai-bridge.com,api-us-west-2.insurance-ai-bridge.com,api-eu-west-1.insurance-ai-bridge.com"
+        - name: ONPREM_ENDPOINT
+          value: "onprem-api.insurance-ai-bridge.internal"
+        volumeMounts:
+        - name: gateway-config
+          mountPath: /etc/gateway
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "512Mi"
+          limits:
+            cpu: "2000m"
+            memory: "2Gi"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 5
+      volumes:
+      - name: gateway-config
+        configMap:
+          name: hybrid-gateway-config
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - hybrid-api-gateway
+              topologyKey: kubernetes.io/hostname
+
+---
+# Hybrid API Gateway Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: hybrid-api-gateway
+  namespace: insurance-ai-bridge
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
+    name: http
+  - port: 443
+    targetPort: 8443
+    protocol: TCP
+    name: https
+  selector:
+    app: hybrid-api-gateway
+
