@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security & HIPAA Compliance - Insurance AI Bridge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #0d1117;
+            --card-bg: #161b22;
+            --accent: #3fb950;
+            --accent-blue: #58a6ff;
+            --text: #c9d1d9;
+            --text-dim: #8b949e;
+            --border: #30363d;
+            --warning: #d29922;
+            --danger: #f85149;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+            padding: 50px 20px;
+            background: linear-gradient(135deg, rgba(63, 185, 80, 0.1), rgba(88, 166, 255, 0.1));
+            border-radius: 20px;
+            border: 1px solid var(--border);
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-dim);
+        }
+
+        .compliance-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 50px;
+        }
+
+        .compliance-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--accent);
+            border-radius: 12px;
+            padding: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .compliance-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 40px rgba(63, 185, 80, 0.2);
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 15px;
+        }
+
+        .card-desc {
+            color: var(--text-dim);
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .checklist {
+            list-style: none;
+        }
+
+        .checklist li {
+            padding: 8px 0;
+            color: var(--text);
+            display: flex;
+            align-items: start;
+            gap: 10px;
+        }
+
+        .checklist li::before {
+            content: '✓';
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .pii-flow {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 40px;
+            margin-bottom: 50px;
+        }
+
+        .flow-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            text-align: center;
+            color: var(--text);
+        }
+
+        .flow-steps {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .flow-step {
+            flex: 1;
+            min-width: 200px;
+            text-align: center;
+            padding: 25px;
+            background: rgba(63, 185, 80, 0.05);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            position: relative;
+        }
+
+        .flow-step.active {
+            border-color: var(--accent);
+            box-shadow: 0 0 20px rgba(63, 185, 80, 0.3);
+        }
+
+        .step-number {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin: 0 auto 15px;
+        }
+
+        .step-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+
+        .step-desc {
+            font-size: 0.9rem;
+            color: var(--text-dim);
+        }
+
+        .flow-arrow {
+            font-size: 2rem;
+            color: var(--accent);
+            flex-shrink: 0;
+        }
+
+        .data-table {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 50px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 15px;
+            border-bottom: 2px solid var(--border);
+            color: var(--accent-blue);
+            font-weight: 600;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .code {
+            font-family: 'JetBrains Mono', monospace;
+            background: rgba(88, 166, 255, 0.1);
+            padding: 2px 8px;
+            border-radius: 4px;
+            color: var(--accent-blue);
+            font-size: 0.9rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .badge.masked {
+            background: rgba(63, 185, 80, 0.2);
+            color: var(--accent);
+        }
+
+        .badge.secure {
+            background: rgba(88, 166, 255, 0.2);
+            color: var(--accent-blue);
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            .flow-steps {
+                flex-direction: column;
+            }
+
+            .flow-arrow {
+                transform: rotate(90deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔒 Security & HIPAA Compliance</h1>
+            <div class="subtitle">Zero-retention PII policy • End-to-end encryption • Full audit logging</div>
+        </header>
+
+        <!-- HIPAA Compliance Checklist -->
+        <div class="compliance-grid">
+            <div class="compliance-card">
+                <div class="card-icon">🛡️</div>
+                <div class="card-title">PII Protection</div>
+                <div class="card-desc">
+                    Comprehensive tokenization system ensuring zero PII retention in external services.
+                </div>
+                <ul class="checklist">
+                    <li>AES-256 encryption for tokenization</li>
+                    <li>Automatic PII detection and masking</li>
+                    <li>Zero-retention policy for LLM calls</li>
+                    <li>Memory clearing after processing</li>
+                    <li>Secure token-to-data mapping</li>
+                </ul>
+            </div>
+
+            <div class="compliance-card">
+                <div class="card-icon">🔐</div>
+                <div class="card-title">Data Encryption</div>
+                <div class="card-desc">
+                    Encryption at rest and in transit with industry-standard protocols.
+                </div>
+                <ul class="checklist">
+                    <li>TLS 1.3 for data in transit</li>
+                    <li>AES-256 encryption at rest</li>
+                    <li>Secure key management (AWS Secrets Manager)</li>
+                    <li>Encrypted database connections</li>
+                    <li>Certificate-based authentication</li>
+                </ul>
+            </div>
+
+            <div class="compliance-card">
+                <div class="card-icon">👥</div>
+                <div class="card-title">Access Controls</div>
+                <div class="card-desc">
+                    Role-based access control with multi-factor authentication.
+                </div>
+                <ul class="checklist">
+                    <li>Role-based access control (RBAC)</li>
+                    <li>Multi-factor authentication (MFA)</li>
+                    <li>15-minute session timeout</li>
+                    <li>Minimum necessary access principle</li>
+                    <li>Automatic logout on inactivity</li>
+                </ul>
+            </div>
+
+            <div class="compliance-card">
+                <div class="card-icon">📊</div>
+                <div class="card-title">Audit Logging</div>
+                <div class="card-desc">
+                    Comprehensive audit trail for all data access and system actions.
+                </div>
+                <ul class="checklist">
+                    <li>Complete audit trail (who, what, when)</li>
+                    <li>7-year log retention per HIPAA</li>
+                    <li>Tamper-proof logging system</li>
+                    <li>Real-time security monitoring</li>
+                    <li>Automated alerting for anomalies</li>
+                </ul>
+            </div>
+
+            <div class="compliance-card">
+                <div class="card-icon">🤝</div>
+                <div class="card-title">Business Associate Agreements</div>
+                <div class="card-desc">
+                    Signed BAAs with all third-party service providers.
+                </div>
+                <ul class="checklist">
+                    <li>BAA with OpenAI/Anthropic</li>
+                    <li>BAA with cloud providers</li>
+                    <li>Data Processing Agreements</li>
+                    <li>Vendor security assessments</li>
+                    <li>Regular compliance reviews</li>
+                </ul>
+            </div>
+
+            <div class="compliance-card">
+                <div class="card-icon">🗄️</div>
+                <div class="card-title">Data Retention & Disposal</div>
+                <div class="card-desc">
+                    Automated data lifecycle management with secure disposal.
+                </div>
+                <ul class="checklist">
+                    <li>7-year retention for medical records</li>
+                    <li>Automated data lifecycle management</li>
+                    <li>Secure data disposal procedures</li>
+                    <li>Regular data purging</li>
+                    <li>Encrypted backup storage</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- PII Protection Flow -->
+        <div class="pii-flow">
+            <h2 class="flow-title">PII Protection Flow</h2>
+            <div class="flow-steps">
+                <div class="flow-step active">
+                    <div class="step-number">1</div>
+                    <div class="step-title">Data Extraction</div>
+                    <div class="step-desc">Claim data retrieved from legacy systems</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step active">
+                    <div class="step-number">2</div>
+                    <div class="step-title">PII Detection</div>
+                    <div class="step-desc">Automatic detection of names, DOB, SSN</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step active">
+                    <div class="step-number">3</div>
+                    <div class="step-title">Tokenization</div>
+                    <div class="step-desc">AES-256 encryption to secure tokens</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step active">
+                    <div class="step-number">4</div>
+                    <div class="step-title">LLM Processing</div>
+                    <div class="step-desc">Only tokens sent to external APIs</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step active">
+                    <div class="step-number">5</div>
+                    <div class="step-title">Re-hydration</div>
+                    <div class="step-desc">Tokens replaced in secure backend</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step active">
+                    <div class="step-number">6</div>
+                    <div class="step-title">Memory Clear</div>
+                    <div class="step-desc">Token map cleared (zero retention)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PII Masking Example -->
+        <div class="data-table">
+            <h2 style="margin-bottom: 25px; color: var(--text);">PII Masking Example</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Data Field</th>
+                        <th>Original Value (Secure Backend)</th>
+                        <th>Masked Value (Sent to LLM)</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Member Name</strong></td>
+                        <td>John Smith</td>
+                        <td><span class="code">TOKEN_A7F3E9D2F8B1C5E6</span></td>
+                        <td><span class="badge masked">Masked</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Date of Birth</strong></td>
+                        <td>1980-03-15</td>
+                        <td><span class="code">TOKEN_B8G4F0E3A2D7C9H1</span></td>
+                        <td><span class="badge masked">Masked</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Social Security Number</strong></td>
+                        <td>123-45-6789</td>
+                        <td><span class="code">TOKEN_C9H5G1F4B3E8D0I2</span></td>
+                        <td><span class="badge masked">Masked</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Medical Record Number</strong></td>
+                        <td>MRN-78453</td>
+                        <td><span class="code">TOKEN_D0I6H2G5C4F9E1J3</span></td>
+                        <td><span class="badge masked">Masked</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Claim Amount</strong></td>
+                        <td>$3,245.00</td>
+                        <td>$3,245.00</td>
+                        <td><span class="badge secure">Not PII</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Procedure Code</strong></td>
+                        <td>CPT-70552</td>
+                        <td>CPT-70552</td>
+                        <td><span class="badge secure">Not PII</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <footer style="text-align: center; padding: 40px 20px; border-top: 1px solid var(--border); color: var(--text-dim);">
+            <p><strong>HIPAA Compliant • Zero-Retention PII • Enterprise Security</strong></p>
+            <p style="margin-top: 15px;">
+                <a href="index.html" style="color: var(--accent-blue); text-decoration: none;">← Back to Overview</a>
+            </p>
+        </footer>
+    </div>
+</body>
+</html>

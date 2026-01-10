@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cost Savings Analysis - Insurance AI Bridge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #ffffff;
+            --card-bg: #f8f9fa;
+            --accent: #10b981;
+            --accent-blue: #3b82f6;
+            --accent-red: #ef4444;
+            --text: #1a1a1a;
+            --text-dim: #6b7280;
+            --border: #e5e7eb;
+            --shadow: rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Manrope', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+            padding: 50px 20px;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(59, 130, 246, 0.1));
+            border-radius: 20px;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-dim);
+        }
+
+        .comparison-section {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 50px;
+            margin-bottom: 50px;
+            box-shadow: 0 4px 20px var(--shadow);
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 40px;
+            text-align: center;
+            color: var(--text);
+        }
+
+        .bars-container {
+            display: flex;
+            gap: 60px;
+            justify-content: center;
+            align-items: flex-end;
+            height: 400px;
+            margin-bottom: 40px;
+            padding: 0 40px;
+        }
+
+        .bar-group {
+            flex: 1;
+            max-width: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .bar {
+            width: 100%;
+            border-radius: 12px 12px 0 0;
+            position: relative;
+            transition: all 0.3s ease;
+            box-shadow: 0 -10px 30px var(--shadow);
+        }
+
+        .bar.old {
+            background: linear-gradient(180deg, var(--accent-red), #fca5a5);
+            height: 100%;
+        }
+
+        .bar.new {
+            background: linear-gradient(180deg, var(--accent), #6ee7b7);
+            height: 33%;
+        }
+
+        .bar:hover {
+            transform: scaleY(1.05);
+        }
+
+        .bar-value {
+            position: absolute;
+            top: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--text);
+            white-space: nowrap;
+        }
+
+        .bar-label {
+            margin-top: 20px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--text);
+        }
+
+        .bar-sublabel {
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            margin-top: 8px;
+        }
+
+        .savings-highlight {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-blue));
+            border-radius: 16px;
+            color: white;
+            margin-bottom: 50px;
+        }
+
+        .savings-amount {
+            font-size: 4rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .savings-label {
+            font-size: 1.3rem;
+            opacity: 0.9;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 50px;
+        }
+
+        .metric-card {
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px var(--shadow);
+            border-color: var(--accent);
+        }
+
+        .metric-value {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .metric-label {
+            color: var(--text-dim);
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .metric-change {
+            margin-top: 10px;
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        .roi-section {
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            padding: 50px;
+            margin-bottom: 50px;
+        }
+
+        .roi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .roi-item {
+            padding: 25px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            border-left: 4px solid var(--accent);
+        }
+
+        .roi-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: var(--text);
+        }
+
+        .roi-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--accent);
+            margin-bottom: 5px;
+        }
+
+        .roi-desc {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            .bars-container {
+                flex-direction: column;
+                height: auto;
+                gap: 40px;
+            }
+
+            .bar {
+                height: 200px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>💰 Cost Savings Analysis</h1>
+            <div class="subtitle">Measurable ROI from AI-powered claim processing automation</div>
+        </header>
+
+        <!-- Savings Highlight -->
+        <div class="savings-highlight">
+            <div class="savings-amount">$336,000</div>
+            <div class="savings-label">Annual Cost Savings</div>
+            <div style="margin-top: 15px; font-size: 1rem; opacity: 0.8;">67% reduction in manual labor overhead</div>
+        </div>
+
+        <!-- Comparison Chart -->
+        <div class="comparison-section">
+            <h2 class="section-title">Monthly Cost Comparison</h2>
+            <div class="bars-container">
+                <div class="bar-group">
+                    <div class="bar old">
+                        <div class="bar-value">$40,000</div>
+                    </div>
+                    <div class="bar-label">Before AI Bridge</div>
+                    <div class="bar-sublabel">18 min/claim average<br>Manual processing</div>
+                </div>
+                <div class="bar-group">
+                    <div class="bar new">
+                        <div class="bar-value">$12,000</div>
+                    </div>
+                    <div class="bar-label">After AI Bridge</div>
+                    <div class="bar-sublabel">2 min/claim average<br>AI-assisted processing</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Metrics -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-value">89%</div>
+                <div class="metric-label">Faster Processing</div>
+                <div class="metric-change">↓ From 18 min to 2 min</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">$28K</div>
+                <div class="metric-label">Monthly Savings</div>
+                <div class="metric-change">↑ 67% cost reduction</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">847</div>
+                <div class="metric-label">Claims/Day Capacity</div>
+                <div class="metric-change">↑ 4x increase</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">12.3%</div>
+                <div class="metric-label">Error Rate Reduction</div>
+                <div class="metric-change">↑ Improved accuracy</div>
+            </div>
+        </div>
+
+        <!-- ROI Breakdown -->
+        <div class="roi-section">
+            <h2 class="section-title">Return on Investment Breakdown</h2>
+            <div class="roi-grid">
+                <div class="roi-item">
+                    <div class="roi-title">Time Savings</div>
+                    <div class="roi-value">16 min</div>
+                    <div class="roi-desc">Saved per claim (18 min → 2 min)</div>
+                </div>
+                <div class="roi-item">
+                    <div class="roi-title">Labor Cost Savings</div>
+                    <div class="roi-value">$28K/mo</div>
+                    <div class="roi-desc">Reduced manual processing overhead</div>
+                </div>
+                <div class="roi-item">
+                    <div class="roi-title">Annual Savings</div>
+                    <div class="roi-value">$336K</div>
+                    <div class="roi-desc">Total cost reduction per year</div>
+                </div>
+                <div class="roi-item">
+                    <div class="roi-title">Payback Period</div>
+                    <div class="roi-value">3-4 mo</div>
+                    <div class="roi-desc">Time to recover implementation costs</div>
+                </div>
+                <div class="roi-item">
+                    <div class="roi-title">Productivity Gain</div>
+                    <div class="roi-value">4x</div>
+                    <div class="roi-desc">Increase in claims processing capacity</div>
+                </div>
+                <div class="roi-item">
+                    <div class="roi-title">Accuracy Improvement</div>
+                    <div class="roi-value">12.3%</div>
+                    <div class="roi-desc">Reduction in processing errors</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cost Breakdown -->
+        <div class="comparison-section">
+            <h2 class="section-title">Cost Structure Analysis</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-top: 30px;">
+                <div style="padding: 30px; background: white; border-radius: 12px; border: 2px solid var(--accent-red);">
+                    <h3 style="color: var(--accent-red); margin-bottom: 20px; font-size: 1.3rem;">Before (Manual)</h3>
+                    <div style="line-height: 2;">
+                        <div><strong>Staff Labor:</strong> $35,000/mo</div>
+                        <div><strong>Overtime Costs:</strong> $4,000/mo</div>
+                        <div><strong>Error Corrections:</strong> $1,000/mo</div>
+                        <div style="margin-top: 15px; padding-top: 15px; border-top: 2px solid var(--border);">
+                            <strong style="font-size: 1.2rem;">Total: $40,000/mo</strong>
+                        </div>
+                    </div>
+                </div>
+                <div style="padding: 30px; background: white; border-radius: 12px; border: 2px solid var(--accent);">
+                    <h3 style="color: var(--accent); margin-bottom: 20px; font-size: 1.3rem;">After (AI-Assisted)</h3>
+                    <div style="line-height: 2;">
+                        <div><strong>Staff Labor:</strong> $8,000/mo</div>
+                        <div><strong>AI API Costs:</strong> $2,500/mo</div>
+                        <div><strong>Infrastructure:</strong> $1,500/mo</div>
+                        <div style="margin-top: 15px; padding-top: 15px; border-top: 2px solid var(--border);">
+                            <strong style="font-size: 1.2rem; color: var(--accent);">Total: $12,000/mo</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer style="text-align: center; padding: 40px 20px; border-top: 2px solid var(--border); color: var(--text-dim);">
+            <p><strong>Proven ROI • Measurable Savings • Quick Payback</strong></p>
+            <p style="margin-top: 15px;">
+                <a href="index.html" style="color: var(--accent-blue); text-decoration: none; font-weight: 600;">← Back to Overview</a>
+            </p>
+        </footer>
+    </div>
+</body>
+</html>
