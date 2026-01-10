@@ -23,12 +23,12 @@
 Your browser opens automatically! Navigate using the homepage or direct links:
 
 - 🏠 **Homepage:** http://127.0.0.1:5500/index.html
-- 🏗️ **Architecture:** http://127.0.0.1:5500/system-architecture-viewer.html
-- 📊 **Dashboard:** http://127.0.0.1:5500/ai_bridge_dashboard.html
-- ⚡ **Live Dashboard:** http://127.0.0.1:5500/dashboard-live-system.html
-- 🔍 **Claim Viewer:** http://127.0.0.1:5500/claim-analysis-viewer.html
-- 🔒 **Security:** http://127.0.0.1:5500/security-compliance.html
-- 💰 **Cost Analysis:** http://127.0.0.1:5500/cost-savings.html
+- 🏗️ **Architecture:** http://127.0.0.1:5500/visualizations/system-architecture-viewer.html
+- 📊 **Dashboard:** http://127.0.0.1:5500/visualizations/ai_bridge_dashboard.html
+- ⚡ **Live Dashboard:** http://127.0.0.1:5500/visualizations/dashboard-live-system.html
+- 🔍 **Claim Viewer:** http://127.0.0.1:5500/visualizations/claim-analysis-viewer.html
+- 🔒 **Security:** http://127.0.0.1:5500/visualizations/security-compliance.html
+- 💰 **Cost Analysis:** http://127.0.0.1:5500/visualizations/cost-savings.html
 
 ---
 

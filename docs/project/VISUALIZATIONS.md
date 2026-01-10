@@ -13,7 +13,7 @@ These HTML visualizations are designed to help clients, stakeholders, and develo
 
 ## 📁 Available Visualizations
 
-### 🏠 [Project Homepage](index.html)
+### 🏠 [Project Homepage](../index.html)
 **Purpose:** Central hub with navigation to all visualizations  
 **Best for:** First-time visitors, overview of the entire project  
 **Features:**
@@ -24,7 +24,7 @@ These HTML visualizations are designed to help clients, stakeholders, and develo
 
 ---
 
-### 🏗️ [System Architecture Viewer](system-architecture-viewer.html)
+### 🏗️ [System Architecture Viewer](../visualizations/system-architecture-viewer.html)
 **Purpose:** Detailed technical architecture visualization  
 **Best for:** Developers, architects, technical stakeholders  
 **Features:**
@@ -36,7 +36,7 @@ These HTML visualizations are designed to help clients, stakeholders, and develo
 
 ---
 
-### 📊 [Interactive Dashboard](ai_bridge_dashboard.html)
+### 📊 [Interactive Dashboard](../visualizations/ai_bridge_dashboard.html)
 **Purpose:** Real-time claim processing workflow visualization  
 **Best for:** Business users, product managers  
 **Features:**
@@ -48,7 +48,7 @@ These HTML visualizations are designed to help clients, stakeholders, and develo
 
 ---
 
-### ⚡ [Live System Dashboard](dashboard-live-system.html)
+### ⚡ [Live System Dashboard](../visualizations/dashboard-live-system.html)
 **Purpose:** Live data streaming and real-time processing simulation  
 **Best for:** Demonstrating system capabilities  
 **Features:**
@@ -60,7 +60,7 @@ These HTML visualizations are designed to help clients, stakeholders, and develo
 
 ---
 
-### 🔍 [Claim Analysis Viewer](claim-analysis-viewer.html)
+### 🔍 [Claim Analysis Viewer](../visualizations/claim-analysis-viewer.html)
 **Purpose:** Step-by-step AI claim analysis demonstration  
 **Best for:** Understanding the AI analysis process  
 **Features:**
@@ -72,7 +72,7 @@ These HTML visualizations are designed to help clients, stakeholders, and develo
 
 ---
 
-### 🔒 [Security & Compliance](security-compliance.html)
+### 🔒 [Security & Compliance](../visualizations/security-compliance.html)
 **Purpose:** HIPAA compliance and security features visualization  
 **Best for:** Security teams, compliance officers  
 **Features:**
@@ -84,7 +84,7 @@ These HTML visualizations are designed to help clients, stakeholders, and develo
 
 ---
 
-### 💰 [Cost Savings Analysis](cost-savings.html)
+### 💰 [Cost Savings Analysis](../visualizations/cost-savings.html)
 **Purpose:** ROI breakdown and cost reduction visualization  
 **Best for:** Business stakeholders, decision makers  
 **Features:**
@@ -151,7 +151,7 @@ Each visualization uses a unique design theme:
 
 ## 📝 Integration with README
 
-These visualizations are integrated into the main [README.md](README.md) file:
+These visualizations are integrated into the main [README.md](../README.md) file:
 
 - Links in the "Visual Project Overview" section
 - References throughout the documentation
@@ -176,8 +176,8 @@ To update visualizations:
 ## 📞 Questions?
 
 If you have questions about the visualizations:
-- Check the [main README](README.md) for project overview
-- Review [architecture documentation](docs/architecture.md)
+- Check the [main README](../README.md) for project overview
+- Review [architecture documentation](../architecture.md)
 - Contact: devancormick@outlook.com
 
 ---

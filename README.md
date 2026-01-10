@@ -17,12 +17,12 @@ Before diving into the code, explore our **interactive visualizations** to see t
 | Visualization | Description | Quick Link |
 |--------------|-------------|-----------|
 | 🏠 **Homepage** | Central hub with stats & navigation | [index.html](index.html) |
-| 🏗️ **Architecture** | Complete system design | [system-architecture-viewer.html](system-architecture-viewer.html) |
-| 📊 **Dashboard** | Interactive claim processing | [ai_bridge_dashboard.html](ai_bridge_dashboard.html) |
-| ⚡ **Live System** | Real-time data streaming | [dashboard-live-system.html](dashboard-live-system.html) |
-| 🔍 **Claim Viewer** | Step-by-step AI analysis | [claim-analysis-viewer.html](claim-analysis-viewer.html) |
-| 🔒 **Security** | HIPAA compliance features | [security-compliance.html](security-compliance.html) |
-| 💰 **Cost Analysis** | ROI & savings breakdown | [cost-savings.html](cost-savings.html) |
+| 🏗️ **Architecture** | Complete system design | [system-architecture-viewer.html](visualizations/system-architecture-viewer.html) |
+| 📊 **Dashboard** | Interactive claim processing | [ai_bridge_dashboard.html](visualizations/ai_bridge_dashboard.html) |
+| ⚡ **Live System** | Real-time data streaming | [dashboard-live-system.html](visualizations/dashboard-live-system.html) |
+| 🔍 **Claim Viewer** | Step-by-step AI analysis | [claim-analysis-viewer.html](visualizations/claim-analysis-viewer.html) |
+| 🔒 **Security** | HIPAA compliance features | [security-compliance.html](visualizations/security-compliance.html) |
+| 💰 **Cost Analysis** | ROI & savings breakdown | [cost-savings.html](visualizations/cost-savings.html) |
 
 **💡 Tip:** Press `Ctrl+K V` in Cursor/VS Code to preview any HTML file side-by-side!
 
@@ -197,14 +197,14 @@ Click any visualization below to view it, or use the [Project Homepage](index.ht
 - Responsive grid layout
 - Quick links section for documentation
 
-[▶️ Open index.html](index.html) | [📖 Viewing Guide](VIEW-VISUALIZATIONS.md)
+[▶️ Open index.html](index.html) | [📖 Viewing Guide](docs/project/VIEW-VISUALIZATIONS.md)
 
 </details>
 
 <details>
 <summary><strong>🏗️ System Architecture Viewer</strong> - Complete technical architecture (Click to expand)</summary>
 
-**File:** [`system-architecture-viewer.html`](system-architecture-viewer.html)
+**File:** [`system-architecture-viewer.html`](visualizations/system-architecture-viewer.html)
 
 **Features:**
 - 🏛️ 4-layer architecture visualization (Frontend → API → Integration → Legacy)
@@ -221,14 +221,14 @@ Click any visualization below to view it, or use the [Project Homepage](index.ht
 - Security compliance cards with icons
 - Animated floating particles
 
-[▶️ Open system-architecture-viewer.html](system-architecture-viewer.html)
+[▶️ Open system-architecture-viewer.html](visualizations/system-architecture-viewer.html)
 
 </details>
 
 <details>
 <summary><strong>📊 Interactive Dashboard</strong> - Claim processing workflow (Click to expand)</summary>
 
-**File:** [`ai_bridge_dashboard.html`](ai_bridge_dashboard.html)
+**File:** [`ai_bridge_dashboard.html`](visualizations/ai_bridge_dashboard.html)
 
 **Features:**
 - 🔄 Real-time architecture flow diagram (4-stage process)
@@ -245,14 +245,14 @@ Click any visualization below to view it, or use the [Project Homepage](index.ht
 - Live loading spinners
 - Interactive result cards
 
-[▶️ Open ai_bridge_dashboard.html](ai_bridge_dashboard.html)
+[▶️ Open ai_bridge_dashboard.html](visualizations/ai_bridge_dashboard.html)
 
 </details>
 
 <details>
 <summary><strong>⚡ Live System Dashboard</strong> - Real-time data streaming (Click to expand)</summary>
 
-**File:** [`dashboard-live-system.html`](dashboard-live-system.html)
+**File:** [`dashboard-live-system.html`](visualizations/dashboard-live-system.html)
 
 **Features:**
 - 📊 Live stats bar with animated counters
@@ -269,14 +269,14 @@ Click any visualization below to view it, or use the [Project Homepage](index.ht
 - Pulsing status indicators
 - Live data lines with timestamps
 
-[▶️ Open dashboard-live-system.html](dashboard-live-system.html)
+[▶️ Open dashboard-live-system.html](visualizations/dashboard-live-system.html)
 
 </details>
 
 <details>
 <summary><strong>🔍 Claim Analysis Viewer</strong> - Step-by-step AI analysis (Click to expand)</summary>
 
-**File:** [`claim-analysis-viewer.html`](claim-analysis-viewer.html)
+**File:** [`claim-analysis-viewer.html`](visualizations/claim-analysis-viewer.html)
 
 **Features:**
 - 📋 Claim details panel with metadata
@@ -293,14 +293,14 @@ Click any visualization below to view it, or use the [Project Homepage](index.ht
 - Policy cards with syntax highlighting
 - Interactive hover effects
 
-[▶️ Open claim-analysis-viewer.html](claim-analysis-viewer.html)
+[▶️ Open claim-analysis-viewer.html](visualizations/claim-analysis-viewer.html)
 
 </details>
 
 <details>
 <summary><strong>🔒 Security & Compliance</strong> - HIPAA compliance features (Click to expand)</summary>
 
-**File:** [`security-compliance.html`](security-compliance.html)
+**File:** [`security-compliance.html`](visualizations/security-compliance.html)
 
 **Features:**
 - ✅ 6 HIPAA compliance cards with checklists
@@ -317,14 +317,14 @@ Click any visualization below to view it, or use the [Project Homepage](index.ht
 - Color-coded status badges (Masked/Secure)
 - Code-styled token examples
 
-[▶️ Open security-compliance.html](security-compliance.html)
+[▶️ Open security-compliance.html](visualizations/security-compliance.html)
 
 </details>
 
 <details>
 <summary><strong>💰 Cost Savings Analysis</strong> - ROI breakdown and savings (Click to expand)</summary>
 
-**File:** [`cost-savings.html`](cost-savings.html)
+**File:** [`cost-savings.html`](visualizations/cost-savings.html)
 
 **Features:**
 - 💵 Annual savings highlight ($336,000)
@@ -340,7 +340,7 @@ Click any visualization below to view it, or use the [Project Homepage](index.ht
 - ROI cards with visual hierarchy
 - Side-by-side cost comparison
 
-[▶️ Open cost-savings.html](cost-savings.html)
+[▶️ Open cost-savings.html](visualizations/cost-savings.html)
 
 </details>
 
@@ -361,7 +361,7 @@ Click any visualization below to view it, or use the [Project Homepage](index.ht
 - Press `Ctrl+Shift+P` → "Simple Browser: Show"
 - Enter file path to view in-editor
 
-> 📖 **Detailed instructions:** See [VIEW-VISUALIZATIONS.md](VIEW-VISUALIZATIONS.md) and [.vscode/HTML-PREVIEW-GUIDE.md](.vscode/HTML-PREVIEW-GUIDE.md)
+> 📖 **Detailed instructions:** See [VIEW-VISUALIZATIONS.md](docs/project/VIEW-VISUALIZATIONS.md) and [.vscode/HTML-PREVIEW-GUIDE.md](.vscode/HTML-PREVIEW-GUIDE.md)
 
 ---
 
@@ -369,8 +369,8 @@ Click any visualization below to view it, or use the [Project Homepage](index.ht
 
 ### Interactive Visualizations
 - [🏠 Project Homepage](index.html) - Central navigation hub
-- [📊 Visualizations Guide](VISUALIZATIONS.md) - Complete guide to all HTML visualizations
-- [👁️ Quick Viewing Guide](VIEW-VISUALIZATIONS.md) - How to view HTML files
+- [📊 Visualizations Guide](docs/project/VISUALIZATIONS.md) - Complete guide to all HTML visualizations
+- [👁️ Quick Viewing Guide](docs/project/VIEW-VISUALIZATIONS.md) - How to view HTML files
 
 ### Technical Documentation
 - [Architecture Documentation](docs/architecture.md)
