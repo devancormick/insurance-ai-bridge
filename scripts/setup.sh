@@ -10,8 +10,8 @@ echo "📦 Verifying Git repository..."
 if [ ! -d ".git" ]; then
     echo "Initializing Git repository..."
     git init
-    git config user.name "devancormik"
-    git config user.email "devancormik@users.noreply.github.com"
+    git config user.name "devancormick"
+    git config user.email "devancormick@users.noreply.github.com"
     git branch -M main
 fi
 
