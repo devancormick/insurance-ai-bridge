@@ -5,6 +5,7 @@ from app.schemas.claim_analysis import ClaimAnalysisRequest, ClaimAnalysisRespon
 from app.core.pii_handler import PIIHandler
 from app.core.data_aggregator import DataAggregator
 from app.core.llm_orchestrator import LLMOrchestrator
+from app.utils.logging import logger
 import time
 
 router = APIRouter()
@@ -36,36 +37,19 @@ async def analyze_claim(claim_id: str, request: ClaimAnalysisRequest) -> ClaimAn
         # Mask PII before sending to LLM
         masked_context = pii_handler.mask_pii(context)
         
-        # TODO: Call LLM orchestrator (currently not implemented)
-        # For now, return a mock response
-        from app.schemas.claim_analysis import ClaimAnalysis, ReasoningStep, PolicyReference
-        
-        mock_analysis = ClaimAnalysis(
-            claim_id=claim_id,
-            status="pending_review",
-            recommended_action="Review claim documentation for completeness",
-            confidence_score=0.85,
-            reasoning_steps=[
-                ReasoningStep(
-                    step_number=1,
-                    description="Claim data aggregated from multiple sources",
-                    data_sources=["legacy_db", "soap_api"]
-                )
-            ],
-            policy_sections=[],
-            potential_issues=[],
-            tokens_used=0
-        )
+        # Call LLM orchestrator for analysis
+        analysis = await llm_orchestrator.analyze_claim(masked_context)
         
         processing_time_ms = int((time.time() - start_time) * 1000)
         
         return ClaimAnalysisResponse(
             success=True,
-            data=mock_analysis,
+            data=analysis,
             processing_time_ms=processing_time_ms
         )
         
     except Exception as e:
+        logger.error(f"Error analyzing claim {claim_id}: {e}", exc_info=True)
         processing_time_ms = int((time.time() - start_time) * 1000)
         return ClaimAnalysisResponse(
             success=False,
@@ -74,5 +58,6 @@ async def analyze_claim(claim_id: str, request: ClaimAnalysisRequest) -> ClaimAn
         )
     finally:
         # Clear PII tokens (zero retention)
-        pii_handler.clear_tokens()
+        if 'pii_handler' in locals():
+            pii_handler.clear_tokens()
 
