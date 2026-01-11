@@ -9,24 +9,21 @@
 
 Before diving into the code, explore our **interactive visualizations** to see the system in action:
 
-👉 **[Start with the Project Homepage →](index.html)** (Opens interactive navigation hub)
+👉 **[Start with the Project Homepage →](https://devancormick.github.io/insurance-ai-bridge/index.html)** (Opens interactive navigation hub)
 
-<details>
-<summary><strong>📸 Visual Overview</strong> (Click to expand)</summary>
+<summary><strong>📸 Visual Overview</strong></summary>
 
 | Visualization | Description | Quick Link |
 |--------------|-------------|-----------|
-| 🏠 **Homepage** | Central hub with stats & navigation | [index.html](index.html) |
-| 🏗️ **Architecture** | Complete system design | [system-architecture-viewer.html](visualizations/system-architecture-viewer.html) |
-| 📊 **Dashboard** | Interactive claim processing | [ai_bridge_dashboard.html](visualizations/ai_bridge_dashboard.html) |
-| ⚡ **Live System** | Real-time data streaming | [dashboard-live-system.html](visualizations/dashboard-live-system.html) |
-| 🔍 **Claim Viewer** | Step-by-step AI analysis | [claim-analysis-viewer.html](visualizations/claim-analysis-viewer.html) |
-| 🔒 **Security** | HIPAA compliance features | [security-compliance.html](visualizations/security-compliance.html) |
-| 💰 **Cost Analysis** | ROI & savings breakdown | [cost-savings.html](visualizations/cost-savings.html) |
+| 🏠 **Homepage** | Central hub with stats & navigation | [index.html](https://devancormick.github.io/insurance-ai-bridge/index.html) |
+| 🏗️ **Architecture** | Complete system design | [system-architecture-viewer.html](https://devancormick.github.io/insurance-ai-bridge/visualizations/system-architecture-viewer.html) |
+| 📊 **Dashboard** | Interactive claim processing | [ai_bridge_dashboard.html](https://devancormick.github.io/insurance-ai-bridge/visualizations/ai_bridge_dashboard.html) |
+| ⚡ **Live System** | Real-time data streaming | [dashboard-live-system.html](https://devancormick.github.io/insurance-ai-bridge/visualizations/dashboard-live-system.html) |
+| 🔍 **Claim Viewer** | Step-by-step AI analysis | [claim-analysis-viewer.html](https://devancormick.github.io/insurance-ai-bridge/visualizations/claim-analysis-viewer.html) |
+| 🔒 **Security** | HIPAA compliance features | [security-compliance.html](https://devancormick.github.io/insurance-ai-bridge/visualizations/security-compliance.html) |
+| 💰 **Cost Analysis** | ROI & savings breakdown | [cost-savings.html](https://devancormick.github.io/insurance-ai-bridge/visualizations/cost-savings.html) |
 
 **💡 Tip:** Press `Ctrl+K V` in Cursor/VS Code to preview any HTML file side-by-side!
-
-</details>
 
 ---
 
@@ -177,12 +174,12 @@ This system is designed with HIPAA compliance in mind:
 
 ### 🖼️ Visual Preview Gallery
 
-Click any visualization below to view it, or use the [Project Homepage](index.html) for navigation:
+Click any visualization below to view it, or use the [Project Homepage](https://devancormick.github.io/insurance-ai-bridge/index.html) for navigation:
 
 <details>
 <summary><strong>🏠 Project Homepage</strong> - Central hub with navigation (Click to expand)</summary>
 
-**File:** [`index.html`](index.html)
+**File:** [`index.html`](https://devancormick.github.io/insurance-ai-bridge/index.html)
 
 **Features:**
 - ✨ Beautiful gradient homepage with key metrics
@@ -197,14 +194,14 @@ Click any visualization below to view it, or use the [Project Homepage](index.ht
 - Responsive grid layout
 - Quick links section for documentation
 
-[▶️ Open index.html](index.html) | [📖 Viewing Guide](docs/project/VIEW-VISUALIZATIONS.md)
+[▶️ Open index.html](https://devancormick.github.io/insurance-ai-bridge/index.html) | [📖 Viewing Guide](docs/project/VIEW-VISUALIZATIONS.md)
 
 </details>
 
 <details>
 <summary><strong>🏗️ System Architecture Viewer</strong> - Complete technical architecture (Click to expand)</summary>
 
-**File:** [`system-architecture-viewer.html`](visualizations/system-architecture-viewer.html)
+**File:** [`system-architecture-viewer.html`](https://devancormick.github.io/insurance-ai-bridge/visualizations/system-architecture-viewer.html)
 
 **Features:**
 - 🏛️ 4-layer architecture visualization (Frontend → API → Integration → Legacy)
@@ -221,14 +218,14 @@ Click any visualization below to view it, or use the [Project Homepage](index.ht
 - Security compliance cards with icons
 - Animated floating particles
 
-[▶️ Open system-architecture-viewer.html](visualizations/system-architecture-viewer.html)
+[▶️ Open system-architecture-viewer.html](https://devancormick.github.io/insurance-ai-bridge/visualizations/system-architecture-viewer.html)
 
 </details>
 
 <details>
 <summary><strong>📊 Interactive Dashboard</strong> - Claim processing workflow (Click to expand)</summary>
 
-**File:** [`ai_bridge_dashboard.html`](visualizations/ai_bridge_dashboard.html)
+**File:** [`ai_bridge_dashboard.html`](https://devancormick.github.io/insurance-ai-bridge/visualizations/ai_bridge_dashboard.html)
 
 **Features:**
 - 🔄 Real-time architecture flow diagram (4-stage process)
@@ -245,14 +242,14 @@ Click any visualization below to view it, or use the [Project Homepage](index.ht
 - Live loading spinners
 - Interactive result cards
 
-[▶️ Open ai_bridge_dashboard.html](visualizations/ai_bridge_dashboard.html)
+[▶️ Open ai_bridge_dashboard.html](https://devancormick.github.io/insurance-ai-bridge/visualizations/ai_bridge_dashboard.html)
 
 </details>
 
 <details>
 <summary><strong>⚡ Live System Dashboard</strong> - Real-time data streaming (Click to expand)</summary>
 
-**File:** [`dashboard-live-system.html`](visualizations/dashboard-live-system.html)
+**File:** [`dashboard-live-system.html`](https://devancormick.github.io/insurance-ai-bridge/visualizations/dashboard-live-system.html)
 
 **Features:**
 - 📊 Live stats bar with animated counters
@@ -269,14 +266,14 @@ Click any visualization below to view it, or use the [Project Homepage](index.ht
 - Pulsing status indicators
 - Live data lines with timestamps
 
-[▶️ Open dashboard-live-system.html](visualizations/dashboard-live-system.html)
+[▶️ Open dashboard-live-system.html](https://devancormick.github.io/insurance-ai-bridge/visualizations/dashboard-live-system.html)
 
 </details>
 
 <details>
 <summary><strong>🔍 Claim Analysis Viewer</strong> - Step-by-step AI analysis (Click to expand)</summary>
 
-**File:** [`claim-analysis-viewer.html`](visualizations/claim-analysis-viewer.html)
+**File:** [`claim-analysis-viewer.html`](https://devancormick.github.io/insurance-ai-bridge/visualizations/claim-analysis-viewer.html)
 
 **Features:**
 - 📋 Claim details panel with metadata
@@ -293,14 +290,14 @@ Click any visualization below to view it, or use the [Project Homepage](index.ht
 - Policy cards with syntax highlighting
 - Interactive hover effects
 
-[▶️ Open claim-analysis-viewer.html](visualizations/claim-analysis-viewer.html)
+[▶️ Open claim-analysis-viewer.html](https://devancormick.github.io/insurance-ai-bridge/visualizations/claim-analysis-viewer.html)
 
 </details>
 
 <details>
 <summary><strong>🔒 Security & Compliance</strong> - HIPAA compliance features (Click to expand)</summary>
 
-**File:** [`security-compliance.html`](visualizations/security-compliance.html)
+**File:** [`security-compliance.html`](https://devancormick.github.io/insurance-ai-bridge/visualizations/security-compliance.html)
 
 **Features:**
 - ✅ 6 HIPAA compliance cards with checklists
@@ -317,14 +314,14 @@ Click any visualization below to view it, or use the [Project Homepage](index.ht
 - Color-coded status badges (Masked/Secure)
 - Code-styled token examples
 
-[▶️ Open security-compliance.html](visualizations/security-compliance.html)
+[▶️ Open security-compliance.html](https://devancormick.github.io/insurance-ai-bridge/visualizations/security-compliance.html)
 
 </details>
 
 <details>
 <summary><strong>💰 Cost Savings Analysis</strong> - ROI breakdown and savings (Click to expand)</summary>
 
-**File:** [`cost-savings.html`](visualizations/cost-savings.html)
+**File:** [`cost-savings.html`](https://devancormick.github.io/insurance-ai-bridge/visualizations/cost-savings.html)
 
 **Features:**
 - 💵 Annual savings highlight ($336,000)
@@ -340,7 +337,7 @@ Click any visualization below to view it, or use the [Project Homepage](index.ht
 - ROI cards with visual hierarchy
 - Side-by-side cost comparison
 
-[▶️ Open cost-savings.html](visualizations/cost-savings.html)
+[▶️ Open cost-savings.html](https://devancormick.github.io/insurance-ai-bridge/visualizations/cost-savings.html)
 
 </details>
 
@@ -368,7 +365,7 @@ Click any visualization below to view it, or use the [Project Homepage](index.ht
 ## Documentation
 
 ### Interactive Visualizations
-- [🏠 Project Homepage](index.html) - Central navigation hub
+- [🏠 Project Homepage](https://devancormick.github.io/insurance-ai-bridge/index.html) - Central navigation hub
 - [📊 Visualizations Guide](docs/project/VISUALIZATIONS.md) - Complete guide to all HTML visualizations
 - [👁️ Quick Viewing Guide](docs/project/VIEW-VISUALIZATIONS.md) - How to view HTML files
 
